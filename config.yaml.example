@@ -5,8 +5,11 @@ prefix: "$" # What people will say to call a bot command
 
 # Markov
 minMarkov: 100 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
-markovLoad: 2000 # Every [number] of new messages, the markov database will regenerate.
-maxMarkovBytes: 30000000 # Maximum number of bytes to read into memory for each server's message log.
+maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
+                        # to put this into reference, the average word length is 5 characters. Most words
+                        # written will just be aschii characters which utf-8 sees as 1 byte.
+                        # If you know how many words you want to have stored, multiply that number by
+                        # 5 (characters in each word) and you should get a number of bytes to use.
 markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
 logNonAlphanumWords: False # Do you want to treat single-character words like # or % as real words?
 logHttpLinks: False # Do you want to treat http links as real words?

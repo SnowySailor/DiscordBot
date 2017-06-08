@@ -10,7 +10,6 @@ class DiscordBot:
 
 class DiscordServer:
     def __init__(self, server, settings, messages=0):
-        #self.markovMessages = messages
         self.markov = Markov(initEmpty=True)
         self.markov.line_size = messages
 

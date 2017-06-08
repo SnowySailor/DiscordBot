@@ -6,9 +6,10 @@
 import random
 import os
 
+
 class Markov(object):
 
-        def __init__(self, open_file=None, max_size=30000000, initEmpty=False):
+        def __init__(self, open_file=None, max_size=5000000, initEmpty=False):
                 if initEmpty:
                     self.cache = {}
                     self.lines = []
@@ -20,7 +21,6 @@ class Markov(object):
                     self.line_size = len(self.lines)
                     self.database()
 
-
         def file_to_lines(self, max_size):
             oversize = False
 
@@ -31,14 +31,13 @@ class Markov(object):
                 self.open_file.seek(-1 * max_size, os.SEEK_END)
             else:
                 self.open_file.seek(0)
-            data=self.open_file.read()
+            data = self.open_file.read()
             lines = data.split('\n')
             if oversize:
-                # Quick and dirty way of removing the first line, 
+                # Quick and dirty way of removing the first line,
                 # which may or may not be truncated due to the byte limit
                 lines.pop(0)
             return lines
-
 
         def triples(self):
                 """ Generates triples from the given data string. So if our string were
@@ -55,7 +54,6 @@ class Markov(object):
                                 yield (line[i], line[i+1], line[i+2])
                         yield(line[len(line) - 2], line[len(line) - 1], "\n")
 
-
         def database(self):
                 for w1, w2, w3 in self.triples():
                         key = (w1, w2)
@@ -63,7 +61,6 @@ class Markov(object):
                                 self.cache[key].append(w3)
                         else:
                                 self.cache[key] = [w3]
-
 
         def generate_markov_text(self, size=25):
                 while True:
@@ -83,7 +80,6 @@ class Markov(object):
                 """gen_words.append(w3) """
                 return ' '.join(gen_words)
 
-
         def digest_single_message(self, message):
             # Add the new message as a new line
             self.lines.append(message)
@@ -97,7 +93,6 @@ class Markov(object):
                 else:
                     self.cache[key] = [w3]
 
-
         def tipple_one_word(self, message):
             line = message.split()
             # This can happen if a user sends a message with a newline in it. We don't want that data.
@@ -106,4 +101,3 @@ class Markov(object):
             for i in range(len(line)-2):
                 yield (line[i], line[i+1], line[i+2])
             yield(line[len(line) - 2], line[len(line) - 1], "\n")
-
