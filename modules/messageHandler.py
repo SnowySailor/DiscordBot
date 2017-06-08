@@ -53,6 +53,8 @@ async def handle(msg, bot, client):
         return
 
     if re.match("^bot be random", msg.content, re.IGNORECASE):
+        if not msg.server.id in bot.markov:
+            bot.markov[msg.server.id] = DiscordServer(msg.server, bot.settings, 1)
         if bot.markov[msg.server.id].markov.line_size < bot.settings['minMarkov']:
             await client.send_message(msg.channel, "Not enough data")
             return
