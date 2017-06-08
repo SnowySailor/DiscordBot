@@ -53,7 +53,7 @@ async def handle(msg, bot, client):
         return
 
     if re.match("^bot be random", msg.content, re.IGNORECASE):
-        if bot.markov[msg.server.id].markovMessages < bot.settings['minMarkov']:
+        if bot.markov[msg.server.id].markov.line_size < bot.settings['minMarkov']:
             await client.send_message(msg.channel, "Not enough data")
             return
         if not bot.markov[msg.server.id].markov == None:
@@ -77,17 +77,19 @@ def logMessage(msg, bot):
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
             f.write("{}\n".format(msg.content)) # Append the line to the file
             if serverId in bot.markov: # If we already have a value for this server, we don't need to make one
-                bot.markov[serverId].markovMessages += 1 # Add 1 to message count
-                if (bot.markov[serverId].markovMessages % bot.settings['markovLoad'] == 0 or 
-                        bot.markov[serverId].markovMessages == bot.settings['minMarkov']): # Reload every `markovLoad` messages
-                    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes']) # Do the reload
-            else: # If the server doesn't exist in the bot markov dict yet, create it
+                bot.markov[serverId].markov.line_size += 1 # Add 1 to message count
+                if (bot.markov[serverId].markov.line_size % bot.settings['markovLoad'] == 0 or 
+                        bot.markov[serverId].markov.line_size == bot.settings['minMarkov']):
+                    # Reload messages into the markov
+                    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes'])
+            else: 
+                # If the server doesn't exist in the bot markov dict yet, create it
                 bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 1)
 
-            # We also can just digest the data right here and we don't have to worry about doing it later
-            if bot.markov[serverId].markov:
-                bot.markov[serverId].markov.digest_single_message(msg.content)
+            # We also can just digest the data right here and we 
+            # don't have to worry about doing it later
+            bot.markov[serverId].markov.digest_single_message(msg.content)
 
-        #print("New message count for", serverId, "is",bot.markov[serverId].markovMessages)
-        #print("Logged:", msg.content)
+        print("New message count for", serverId, "is",bot.markov[serverId].markov.line_size)
+        print("Logged:", msg.content)
     return

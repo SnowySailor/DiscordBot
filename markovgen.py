@@ -8,12 +8,17 @@ import os
 
 class Markov(object):
 
-        def __init__(self, open_file, max_size):
-                self.cache = {}
-                self.open_file = open_file
-                self.lines = self.file_to_lines(max_size)
-                self.line_size = len(self.lines)
-                self.database()
+        def __init__(self, open_file=None, max_size=30000000, initEmpty=False):
+                if initEmpty:
+                    self.cache = {}
+                    self.lines = []
+                    self.line_size = 0
+                else:
+                    self.cache = {}
+                    self.open_file = open_file
+                    self.lines = self.file_to_lines(max_size)
+                    self.line_size = len(self.lines)
+                    self.database()
 
         def file_to_lines(self, max_size):
             if os.stat(self.open_file.name).st_size > max_size: # If the file is greater than the max size in the config file..
@@ -68,6 +73,11 @@ class Markov(object):
 
 
         def digest_single_message(self, message):
+            # Add the new message as a new line
+            self.lines.append(message)
+            # Increse the total number of lines we have
+            self.line_size += 1
+
             for w1, w2, w3 in self.tipple_one_word(message):
                 key = (w1, w2)
                 if key in self.cache:
