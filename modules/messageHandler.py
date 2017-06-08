@@ -44,7 +44,7 @@ async def handle(msg, bot, client):
         await client.send_message(msg.channel, "Hi {0.author.mention}".format(msg))
         return
 
-    if re.match(".*(im|i'm) (headed|going|off) ?(off)? ?(to)? (bed|sleep)", msg.content, re.IGNORECASE):
+    if re.match(".*((im|i'm)|i am) (headed|going|off) ?(off)? ?(to)? (bed|sleep)", msg.content, re.IGNORECASE):
         await client.send_message(msg.channel, "Good night")
         return
 

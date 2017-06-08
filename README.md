@@ -7,5 +7,6 @@ You may need to create a `logs` directory in the application root. This will hol
 Configure a config.yaml based on the example.
 
 # TODO
-Ignore words that are 1 characters (non-alphanumeric)
-Ignore words that start with something like http
+1. Allow bot to join voice
+2. Configure audio playback
+3. Allow use with youtube-dl to play songs
