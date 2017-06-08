@@ -77,7 +77,6 @@ def logMessage(msg, bot):
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
             f.write("{}\n".format(msg.content)) # Append the line to the file
             if serverId in bot.markov: # If we already have a value for this server, we don't need to make one
-                bot.markov[serverId].markov.line_size += 1 # Add 1 to message count
                 if (bot.markov[serverId].markov.line_size % bot.settings['markovLoad'] == 0 or 
                         bot.markov[serverId].markov.line_size == bot.settings['minMarkov']):
                     # Reload messages into the markov
