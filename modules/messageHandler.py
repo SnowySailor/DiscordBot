@@ -2,10 +2,14 @@ import re
 import random
 import os
 from markovgen import Markov
+from classes import DiscordServer
 
 #Function to handle messages. Uses the regex library to match certian situations.
 #Randomness is to keep the bot from spamming
 async def handle(msg, bot, client):
+
+    logMessage(msg, bot) # Log the message for the markov bot
+
     if re.match(".*spicy", msg.content, re.IGNORECASE):
         s = random.randint(0,2)
         if(s == 1):
@@ -49,11 +53,11 @@ async def handle(msg, bot, client):
         return
 
     if re.match("^bot be random", msg.content, re.IGNORECASE):
-        if not getattr(bot, 'markov', None):
-            await client.send_message(msg.channel, "Loading data.")
-            with open("/tmp/chat.txt","r", encoding='utf-8', errors='ignore') as f:
-                bot.markov = Markov(f)
-        text = bot.markov.generate_markov_text(random.randint(6,40))
+        if bot.markov[msg.server.id].markovMessages < bot.settings['minMarkov']:
+            await client.send_message(msg.channel, "Not enough data")
+            return
+        if not bot.markov[msg.server.id].markov == None:
+            text = bot.markov[msg.server.id].markov.generate_markov_text(random.randint(6,40))
         await client.send_message(msg.channel, text)
         return
 
@@ -63,4 +67,27 @@ async def handle(msg, bot, client):
         output.strip()
         await client.send_message(msg.channel, output)
         return
+    return
+
+
+# Chat logs are stored in logs/[server_id]_chat_log
+def logMessage(msg, bot):
+    if len(msg.content.split()) > 5: # If the message is 6 words or more we log it
+        serverId = msg.server.id
+        with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
+            f.write("{}\n".format(msg.content)) # Append the line to the file
+            if serverId in bot.markov: # If we already have a value for this server, we don't need to make one
+                bot.markov[serverId].markovMessages += 1 # Add 1 to message count
+                if (bot.markov[serverId].markovMessages % bot.settings['markovLoad'] == 0 or 
+                        bot.markov[serverId].markovMessages == bot.settings['minMarkov']): # Reload every `markovLoad` messages
+                    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes']) # Do the reload
+            else: # If the server doesn't exist in the bot markov dict yet, create it
+                bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 1)
+
+            # We also can just digest the data right here and we don't have to worry about doing it later
+            if bot.markov[serverId].markov:
+                bot.markov[serverId].markov.digest_single_message(msg.content)
+
+        #print("New message count for", serverId, "is",bot.markov[serverId].markovMessages)
+        #print("Logged:", msg.content)
     return
