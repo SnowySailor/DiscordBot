@@ -10,19 +10,19 @@ async def handle(msg, bot, client):
 
     logMessage(msg, bot) # Log the message for the markov bot
 
-    if re.match(".*spicy", msg.content, re.IGNORECASE):
+    if re.match("(spicy)", msg.content, re.IGNORECASE):
         s = random.randint(0,2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/l50LNcp.jpg")
             return
 
-    if re.match(".*obama", msg.content, re.IGNORECASE):
+    if re.match("(obama)", msg.content, re.IGNORECASE):
         s = random.randint(0,1)
         if(s == 1):
             await client.send_message(msg.channel, "http://imgur.com/WVwEZ1b.jpg")
             return
 
-    if re.match(".*disappoint", msg.content, re.IGNORECASE):
+    if re.match("(disappoint)", msg.content, re.IGNORECASE):
         s = random.randint(0,2)
         if(s == 1):
             await client.send_message(msg.channel, "http://imgur.com/TfT8wvi.gif")
@@ -34,7 +34,7 @@ async def handle(msg, bot, client):
             await client.send_message(msg.channel, "http://imgur.com/VrM58GT.jpg")
             return
 
-    if re.match(".*obligations", msg.content, re.IGNORECASE):
+    if re.match("(obligations)", msg.content, re.IGNORECASE):
         s = random.randint(0,2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/rbJTvlf.jpg")
@@ -43,6 +43,8 @@ async def handle(msg, bot, client):
     if re.match("^(hi|hello) (waifu|bot) ?(bot)?", msg.content, re.IGNORECASE):
         await client.send_message(msg.channel, "Hi {0.author.mention}".format(msg))
         return
+
+    #if re.match("")
 
     if re.match("^(grr)(\s|.)?", msg.content, re.IGNORECASE):
         s = random.randint(0,4)
@@ -63,11 +65,13 @@ async def handle(msg, bot, client):
         await client.send_message(msg.channel, text)
         return
 
-    if re.match(".*(computer|internet|server) .*(down|slow|broken|broke|sucks|dead)", msg.content, re.IGNORECASE):
-        command = "fortune bofh-excuses | sed -n 3p" # Must have the bofh-excuses installed. For Ubuntu: sudo apt-get install fortune-bofh-excuses
-        output = os.popen(command).read()
-        output.strip()
-        await client.send_message(msg.channel, output)
+    if re.match(".*(computer|internet|server) ?.*(down|slow|broken|broke|sucks|dead)", msg.content, re.IGNORECASE):
+        s = random.randint(0,1)
+        if(s == 1):
+            command = "fortune bofh-excuses | sed -n 3p" # Must have the bofh-excuses installed. For Ubuntu: sudo apt-get install fortune-bofh-excuses
+            output = os.popen(command).read()
+            output.strip()
+            await client.send_message(msg.channel, output)
         return
     return
 
