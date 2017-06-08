@@ -23,5 +23,6 @@ class DiscordServer:
                     pass
                 # We can load the markov if there are messages in the file
                 if i > 1:
+                    print("Loaded data from file")
                     self.markov = Markov(f, settings['maxMarkovBytes'])
-            self.markov.line_size = i
+            self.markov.line_size = i + 1
