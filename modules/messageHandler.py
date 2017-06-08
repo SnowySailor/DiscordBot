@@ -79,12 +79,11 @@ def logMessage(msg, bot):
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
             f.write("{}\n".format(line)) # Append the line to the file
-            if serverId in bot.markov: # If we already have a value for this server, we don't need to make one
-                if (bot.markov[serverId].markov.line_size % bot.settings['markovLoad'] == 0 or 
-                        bot.markov[serverId].markov.line_size == bot.settings['minMarkov']):
+            if not serverId in bot.markov: # If we already have a value for this server, we don't need to make one
+                #if bot.markov[serverId].markov.line_size == bot.settings['minMarkov']:
                     # Reload messages into the markov
-                    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes'])
-            else: 
+                #    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes'])
+            #else: 
                 # If the server doesn't exist in the bot markov dict yet, create it
                 bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 1)
 
