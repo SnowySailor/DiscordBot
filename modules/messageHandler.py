@@ -74,19 +74,27 @@ async def handle(msg, bot, client):
 
 # Chat logs are stored in logs/[server_id]_chat_log
 def logMessage(msg, bot):
+    # If the message is broken up into two or more lines,
+    # we can just replace the newline with a space
     line = msg.content.replace("\n"," ")
-    if len(line.split()) > 5: # If the message is 6 words or more we log it
+    if 'logNonAlphanumWords' in bot.settings and not bot.settings['logNonAlphanumWords']:
+        # We don't want to log non-alphanumeric characters because something like
+        # % or & or # isn't really a valuable word.
+        line = re.sub("\s\W\s", " ", line)
+    if 'logHttpLinks' in bot.settings and not bot.settings['logHttpLinks']:
+        # If we don't want to log http links, we can remove them with regex
+        line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
+    # If the message is longer than the min sentence length
+    # we can process and log it 
+    if len(line.split()) >= bot.settings['markovSentenceLength']:
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
-            f.write("{}\n".format(line)) # Append the line to the file
-            if not serverId in bot.markov: # If we already have a value for this server, we don't need to make one
-                #if bot.markov[serverId].markov.line_size == bot.settings['minMarkov']:
-                    # Reload messages into the markov
-                #    bot.markov[serverId].markov = Markov(f, bot.settings['maxMarkovBytes'])
-            #else: 
+            # Append the line to the file
+            f.write("{}\n".format(line))
+            # If we already have a value for this server, we don't need to make one
+            if not serverId in bot.markov:
                 # If the server doesn't exist in the bot markov dict yet, create it
                 bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 1)
-
             # We also can just digest the data right here and we 
             # don't have to worry about doing it later
             bot.markov[serverId].markov.digest_single_message(line)
