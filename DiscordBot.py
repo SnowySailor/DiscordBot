@@ -1,17 +1,15 @@
 import logging
 import os
 import discord
+from classes import DiscordBot
 from discord.ext import commands
 from modules.parseSettings import getSettings
 from modules.messageHandler import handle
 
-class DiscordBot:
-    def __init__(self, settings):
-        self.markov = None
-        self.settings = settings
-
 bot = DiscordBot(getSettings())
 client = commands.Bot(command_prefix=bot.settings['prefix'], description="Bot")
+
+### EVENTS ###
 
 @client.event
 async def on_message(msg):
@@ -29,6 +27,8 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
+### COMMANDS ###
+
 @client.command()
 async def echo(*val : str):
     await client.say(' '.join(str(x) for x in val))
@@ -36,10 +36,12 @@ async def echo(*val : str):
 
 @client.command()
 async def fortune():
-    command = "/usr/games/fortune bofh-excuses | sed -n 3p"
+    command = "fortune"
     output = os.popen(command).read()
     output.strip()
     await client.say(output)
     return
+
+#######
 
 client.run(bot.settings['token']) # Bot token from config.yaml
