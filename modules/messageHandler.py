@@ -44,9 +44,11 @@ async def handle(msg, bot, client):
         await client.send_message(msg.channel, "Hi {0.author.mention}".format(msg))
         return
 
-    #if re.match("")
+    if re.match("(im|i'm) (going|off) ?(off)? ?(to)? (bed)", msg.content, re.IGNORECASE):
+        await client.send_message(msg.channel, "Good night")
+        return
 
-    if re.match("^(grr)(\s|.)?", msg.content, re.IGNORECASE):
+    if re.match("^(grr)", msg.content, re.IGNORECASE):
         s = random.randint(0,4)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/FH7f5Ta.gif")
