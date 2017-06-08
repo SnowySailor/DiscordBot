@@ -72,10 +72,11 @@ async def handle(msg, bot, client):
 
 # Chat logs are stored in logs/[server_id]_chat_log
 def logMessage(msg, bot):
-    if len(msg.content.split()) > 5: # If the message is 6 words or more we log it
+    line = msg.content.replace("\n"," ")
+    if len(line.split()) > 5: # If the message is 6 words or more we log it
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
-            f.write("{}\n".format(msg.content)) # Append the line to the file
+            f.write("{}\n".format(line)) # Append the line to the file
             if serverId in bot.markov: # If we already have a value for this server, we don't need to make one
                 if (bot.markov[serverId].markov.line_size % bot.settings['markovLoad'] == 0 or 
                         bot.markov[serverId].markov.line_size == bot.settings['minMarkov']):
@@ -87,8 +88,8 @@ def logMessage(msg, bot):
 
             # We also can just digest the data right here and we 
             # don't have to worry about doing it later
-            bot.markov[serverId].markov.digest_single_message(msg.content)
+            bot.markov[serverId].markov.digest_single_message(line)
 
         print("New message count for", serverId, "is",bot.markov[serverId].markov.line_size)
-        print("Logged:", msg.content)
+        print("Logged:", line)
     return

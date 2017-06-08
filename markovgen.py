@@ -20,15 +20,25 @@ class Markov(object):
                     self.line_size = len(self.lines)
                     self.database()
 
+
         def file_to_lines(self, max_size):
-            if os.stat(self.open_file.name).st_size > max_size: # If the file is greater than the max size in the config file..
+            oversize = False
+
+            # If the file is greater than the max size in the config file..
+            if os.stat(self.open_file.name).st_size > max_size:
                 # We only want to get the last max_size bytes from it
+                oversize = True
                 self.open_file.seek(-1 * max_size, os.SEEK_END)
             else:
                 self.open_file.seek(0)
             data=self.open_file.read()
             lines = data.split('\n')
+            if oversize:
+                # Quick and dirty way of removing the first line, 
+                # which may or may not be truncated due to the byte limit
+                lines.pop(0)
             return lines
+
 
         def triples(self):
                 """ Generates triples from the given data string. So if our string were
@@ -45,6 +55,7 @@ class Markov(object):
                                 yield (line[i], line[i+1], line[i+2])
                         yield(line[len(line) - 2], line[len(line) - 1], "\n")
 
+
         def database(self):
                 for w1, w2, w3 in self.triples():
                         key = (w1, w2)
@@ -52,6 +63,7 @@ class Markov(object):
                                 self.cache[key].append(w3)
                         else:
                                 self.cache[key] = [w3]
+
 
         def generate_markov_text(self, size=25):
                 while True:
@@ -85,8 +97,10 @@ class Markov(object):
                 else:
                     self.cache[key] = [w3]
 
+
         def tipple_one_word(self, message):
             line = message.split()
+            # This can happen if a user sends a message with a newline in it. We don't want that data.
             if len(line) < 3:
                 return
             for i in range(len(line)-2):
