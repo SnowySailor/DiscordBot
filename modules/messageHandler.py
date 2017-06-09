@@ -56,6 +56,38 @@ async def handle(msg, bot, client):
             await client.send_message(msg.channel, "_me pats you on the head_")
         return
 
+    if re.match("(it.? ?i?s happening)", msg.content, re.IGNORECASE):
+        await client.send_message(msg.channel, "http://i.imgur.com/YtKWRKk.gif")
+        return
+
+    if re.match(".*\s(love)\s", msg.content, re.IGNORECASE):
+        s = random.randint(0,8)
+        if(s == 1):
+            await client.send_message(msg.channel, "http://i.imgur.com/AqxwFcb.jpg")
+        return
+
+    if re.match("(tomato)", msg.content, re.IGNORECASE):
+        await client.send_message(msg.channel, "http://i.imgur.com/RVgzWvi.jpg")
+        return
+
+    if re.match("(chrome)", msg.content, re.IGNORECASE):
+        s = random.randint(0,4)
+        if(s == 1):
+            await client.send_message(msg.channel, "https://i.imgur.com/i9V4DKH.jpg")
+        return
+
+    if re.match("(iphone)", msg.content, re.IGNORECASE):
+        s = random.randint(0,1)
+        if(s == 1):
+            await client.send_message(msg.channel, "https://i.imgur.com/rEs7rqr.jpg")
+        return
+
+    if re.match(".*\s(expect)\s", msg.content, re.IGNORECASE):
+        s = random.randint(0,50)
+        if(s == 42):
+            await client.send_message(msg.channel, "Nobody expects the Spanish Inquisition!")
+        return
+
     if re.match("^bot be random", msg.content, re.IGNORECASE):
         if msg.server.id not in bot.markov:
             bot.markov[msg.server.id] = DiscordServer(msg.server, bot.settings, 1)
