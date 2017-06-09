@@ -10,31 +10,31 @@ async def handle(msg, bot, client):
     # Log the message for the markov bot
     logMessage(msg, bot)
 
-    if re.match("(spicy)", msg.content, re.IGNORECASE):
+    if re.match(".*(spicy)", msg.content, re.IGNORECASE):
         s = random.randint(0, 2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/l50LNcp.jpg")
             return
 
-    if re.match("(obama)", msg.content, re.IGNORECASE):
+    if re.match(".*(obama)", msg.content, re.IGNORECASE):
         s = random.randint(0, 1)
         if(s == 1):
             await client.send_message(msg.channel, "http://imgur.com/WVwEZ1b.jpg")
             return
 
-    if re.match("(disappoint)", msg.content, re.IGNORECASE):
+    if re.match(".*(disappoint)", msg.content, re.IGNORECASE):
         s = random.randint(0, 2)
         if(s == 1):
             await client.send_message(msg.channel, "http://imgur.com/TfT8wvi.gif")
             return
 
-    if re.match("((you.? ?r?(ar)?e)|your) wrong", msg.content, re.IGNORECASE):
+    if re.match(".*((you.? ?r?(ar)?e)|your) wrong", msg.content, re.IGNORECASE):
         s = random.randint(0, 1)
         if(s == 1):
             await client.send_message(msg.channel, "http://imgur.com/VrM58GT.jpg")
             return
 
-    if re.match("(obligations)", msg.content, re.IGNORECASE):
+    if re.match(".*(obligations)", msg.content, re.IGNORECASE):
         s = random.randint(0, 2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/rbJTvlf.jpg")
@@ -56,7 +56,7 @@ async def handle(msg, bot, client):
             await client.send_message(msg.channel, "_me pats you on the head_")
         return
 
-    if re.match("(it.? ?i?s happening)", msg.content, re.IGNORECASE):
+    if re.match(".*(it.? ?i?s happening)", msg.content, re.IGNORECASE):
         await client.send_message(msg.channel, "http://i.imgur.com/YtKWRKk.gif")
         return
 
@@ -66,17 +66,17 @@ async def handle(msg, bot, client):
             await client.send_message(msg.channel, "http://i.imgur.com/AqxwFcb.jpg")
         return
 
-    if re.match("(tomato)", msg.content, re.IGNORECASE):
+    if re.match(".*(tomato)", msg.content, re.IGNORECASE):
         await client.send_message(msg.channel, "http://i.imgur.com/RVgzWvi.jpg")
         return
 
-    if re.match("(chrome)", msg.content, re.IGNORECASE):
+    if re.match(".*(chrome)", msg.content, re.IGNORECASE):
         s = random.randint(0,4)
         if(s == 1):
             await client.send_message(msg.channel, "https://i.imgur.com/i9V4DKH.jpg")
         return
 
-    if re.match("(iphone)", msg.content, re.IGNORECASE):
+    if re.match(".*(iphone)", msg.content, re.IGNORECASE):
         s = random.randint(0,1)
         if(s == 1):
             await client.send_message(msg.channel, "https://i.imgur.com/rEs7rqr.jpg")
