@@ -63,7 +63,7 @@ async def handle(msg, bot, client):
             await client.send_message(msg.channel, "Not enough data")
             return
         if bot.markov[msg.server.id].markov is not None:
-            text = bot.markov[msg.server.id].markov.generate_markov_text(random.randint(6, 40))
+            text = bot.markov[msg.server.id].markov.generate_markov_text(random.randint(15, 40))
         await client.send_message(msg.channel, text)
         return
 
