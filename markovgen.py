@@ -76,7 +76,21 @@ class Markov(object):
                         gen_words.append(w1)
                         if(w2 == "\n"):
                             break
-                        w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+                        """ Get new words with more tollerance to letter case
+                            Given a string like
+                                "Hello there Tim and Bob"
+                                Where w1 = "there"
+                                      w2 = "Tim"
+                                      (new word "and")
+                            It could also select "it's" from a string like
+                                "Look over there tim it's a seagull"
+                            Because we also check to see if there are lower case versions
+                            of the (w1,w2) pair in the cache.
+                        """
+                        lowerKeyList = []
+                        if (w1.lower(),w2.lower()) in self.cache:
+                            lowerKeyList = self.cache[(w1.lower(),w2.lower())]
+                        w1, w2 = w2, random.choice(list(set().union(self.cache[(w1, w2)], lowerKeyList)))
                 """gen_words.append(w3) """
                 return ' '.join(gen_words)
 
