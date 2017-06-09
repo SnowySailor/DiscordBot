@@ -4,7 +4,7 @@ prefix: "$" # What people will say to call a bot command
 
 
 # Markov
-minMarkov: 100 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
+minMarkov: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
 maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
                         # to put this into reference, the average word length is 5 characters. Most words
                         # written will just be aschii characters which utf-8 sees as 1 byte.
