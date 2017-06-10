@@ -87,10 +87,11 @@ class Markov(object):
                             Because we also check to see if there are lower case versions
                             of the (w1,w2) pair in the cache.
                         """
-                        lowerKeyList = []
-                        if (w1.lower(),w2.lower()) in self.cache:
-                            lowerKeyList = self.cache[(w1.lower(),w2.lower())]
-                        w1, w2 = w2, random.choice(list(set().union(self.cache[(w1, w2)], lowerKeyList)))
+                        #lowerKeyList = []
+                        #if (w1.lower(),w2.lower()) in self.cache:
+                        #    lowerKeyList = self.cache[(w1.lower(),w2.lower())]
+                        #w1, w2 = w2, random.choice(list(set().union(self.cache[(w1, w2)], lowerKeyList)))
+                        w1, w2 = w2, random.choice(self.cache[(w1, w2)])
                 """gen_words.append(w3) """
                 return ' '.join(gen_words)
 
@@ -109,7 +110,6 @@ class Markov(object):
 
         def tipple_one_word(self, message):
             line = message.split()
-            # This can happen if a user sends a message with a newline in it. We don't want that data.
             if len(line) < 3:
                 return
             for i in range(len(line)-2):
