@@ -13,3 +13,4 @@ maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each s
 markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
 logNonAlphanumWords: False # Do you want to treat single-character words like # or % as real words?
 logHttpLinks: False # Do you want to treat http links as real words?
+removeHereEveryone: True # Remove @here and @everyone from messages the bot logs

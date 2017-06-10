@@ -123,6 +123,10 @@ def logMessage(msg, bot):
     if 'logHttpLinks' in bot.settings and not bot.settings['logHttpLinks']:
         # If we don't want to log http links, we can remove them with regex
         line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
+
+    if 'removeHereEveryone' in bot.settings and bot.settings['removeHereEveryone']:
+        line = re.sub("\@(here|everyone)\s", "", line)
+        line = re.sub("\s\@(here|everyone)", "", line)
     # If the message is longer than the min sentence length we can process and log it
     if len(line.split()) >= bot.settings['markovSentenceLength']:
         serverId = msg.server.id
