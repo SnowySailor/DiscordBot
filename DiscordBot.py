@@ -39,7 +39,7 @@ async def echo(*val: str):
 
 @client.command()
 async def fortune():
-    command = "fortune fortunes riddles literature"
+    command = "fortune -e fortunes riddles literature"
     output = os.popen(command).read()
     output.strip()
     await client.say(output)
