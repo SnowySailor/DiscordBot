@@ -9,7 +9,7 @@ import os
 
 class Markov(object):
 
-        def __init__(self, open_file=None, max_size=5000000, initEmpty=False):
+        def __init__(self, open_file=None, max_size=5000000, initEmpty=False, min_length=None):
                 if initEmpty:
                     self.cache = {}
                     self.lines = []
@@ -17,11 +17,11 @@ class Markov(object):
                 else:
                     self.cache = {}
                     self.open_file = open_file
-                    self.lines = self.file_to_lines(max_size)
+                    self.lines = self.file_to_lines(max_size, min_length)
                     self.line_size = len(self.lines)
                     self.database()
 
-        def file_to_lines(self, max_size):
+        def file_to_lines(self, max_size, min_length):
             oversize = False
 
             # If the file is greater than the max size in the config file..
@@ -33,6 +33,10 @@ class Markov(object):
                 self.open_file.seek(0)
             data = self.open_file.read()
             lines = data.split('\n')
+            
+            if min_length:
+                # If there is a min length set, filter out lines that are less than this length
+                lines = [x for x in lines if len(x.split()) >= min_length]
             if oversize:
                 # Quick and dirty way of removing the first line,
                 # which may or may not be truncated due to the byte limit

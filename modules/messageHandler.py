@@ -3,12 +3,29 @@ import random
 import os
 from classes import DiscordServer
 
-
 # Function to handle messages. Uses the regex library to match certian situations.
 # Randomness is to keep the bot from spamming
+
+# This function should contain only message responses to what users say
+# It should not contain actual commands or utilities.
 async def handle(msg, bot, client):
     # Log the message for the markov bot
     logMessage(msg, bot)
+
+    if re.match(".*", msg.content, re.IGNORECASE):
+        s = random.randint(0,10000)
+        if(s == 42):
+            n = random.randint(1,3)
+            if(n == 1):
+                await client.send_message(msg.channel,
+                      "Here's a peek behind the scenes of me, {}: <https://www.youtube.com/watch?v=dQw4w9WgXcQ>".format(client.user.name))
+            if(n == 2):
+                await client.send_message(msg.channel,
+                    "Perfection: <https://www.youtube.com/watch?v=dQw4w9WgXcQ>")
+            if(n == 3):
+                await client.send_message(msg.channel,
+                    "<https://www.youtube.com/watch?v=dQw4w9WgXcQ> Obligations")
+            return
 
     if re.match(".*(spicy)", msg.content, re.IGNORECASE):
         s = random.randint(0, 2)
@@ -111,6 +128,15 @@ async def handle(msg, bot, client):
     return
 
 
+# This function should contain what to do about direct messages
+# This function is NOT for fun text replies to user messages sent in servers
+async def handlePersonalMessage(msg, bot, client):
+    return
+
+# This function should contain what to do when the bot is mentioned
+async def handleBotMention(msg, bot, client):
+    return
+
 # Chat logs are stored in logs/[server_id]_chat_log
 def logMessage(msg, bot):
     # If the message is broken up into two or more lines,
@@ -123,10 +149,15 @@ def logMessage(msg, bot):
     if 'logHttpLinks' in bot.settings and not bot.settings['logHttpLinks']:
         # If we don't want to log http links, we can remove them with regex
         line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
-
     if 'removeHereEveryone' in bot.settings and bot.settings['removeHereEveryone']:
+        # If we don't want @here and @everyone recorded, we can remove them
         line = re.sub("\@(here|everyone)\s", "", line)
         line = re.sub("\s\@(here|everyone)", "", line)
+    if 'removeUserMentions' in bot.settings and bot.settings['removeUserMentions']:
+        # If we don't want @User#Num mentions, we can remove them
+        # User mentions are <@69683046830462454> in text as an example
+        line = re.sub("\s?<@[0-9]+>\s", " ", line)
+
     # If the message is longer than the min sentence length we can process and log it
     if len(line.split()) >= bot.settings['markovSentenceLength']:
         serverId = msg.server.id
@@ -135,7 +166,7 @@ def logMessage(msg, bot):
             f.write("{}\n".format(line))
             if serverId not in bot.markov:
                 # Create server object if it doesn't exist yet
-                bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 1)
+                bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 0)
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
             bot.markov[serverId].markov.digest_single_message(line)

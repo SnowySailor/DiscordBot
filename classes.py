@@ -19,9 +19,9 @@ class DiscordServer:
             with open("logs/{}_chat_log".format(server.id), "r",
                       encoding='utf-8', errors='ignore') as f:
                 for i, l in enumerate(f):
-                    pass
+                    if i > 1:
+                        break
                 # We can load the markov if there are messages in the file
                 if i > 1:
                     print("Loaded data from file")
-                    self.markov = Markov(f, settings['maxMarkovBytes'])
-            self.markov.line_size = i + 1
+                    self.markov = Markov(f, settings['maxMarkovBytes'], False, settings['markovSentenceLength'])
