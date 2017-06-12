@@ -10,4 +10,3 @@ Configure a config.yaml based on the example.
 1. Allow bot to join voice
 2. Configure audio playback
 3. Allow use with youtube-dl to play songs
-4. Allow changes to min sentence length when reading back data

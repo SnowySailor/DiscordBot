@@ -69,7 +69,7 @@ async def handle(msg, bot, client):
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/FH7f5Ta.gif")
         if(s == 2):
-            await client.send_message(msg.channel, "_me pats you on the head_")
+            await client.send_message(msg.channel, "_{} pats you on the head_".format(client.user.name))
         return
 
     if re.match(".*(it.? ?i?s happening)", msg.content, re.IGNORECASE):
