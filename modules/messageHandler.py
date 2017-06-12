@@ -25,7 +25,6 @@ async def handle(msg, bot, client):
             if(n == 3):
                 await client.send_message(msg.channel,
                     "<https://www.youtube.com/watch?v=dQw4w9WgXcQ> Obligations")
-            return
 
     if re.match(".*(spicy)", msg.content, re.IGNORECASE):
         s = random.randint(0, 2)
