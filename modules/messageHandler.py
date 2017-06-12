@@ -65,7 +65,7 @@ async def handle(msg, bot, client):
         return
 
     if re.match("^(grr)", msg.content, re.IGNORECASE):
-        s = random.randint(0, 4)
+        s = random.randint(1, 2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/FH7f5Ta.gif")
         if(s == 2):
