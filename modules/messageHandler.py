@@ -76,7 +76,7 @@ async def handle(msg, bot, client):
         await client.send_message(msg.channel, "http://i.imgur.com/YtKWRKk.gif")
         return
 
-    if re.match(".*\s(love)\s", msg.content, re.IGNORECASE):
+    if re.match(".*(love)\s", msg.content, re.IGNORECASE):
         s = random.randint(0,8)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/AqxwFcb.jpg")

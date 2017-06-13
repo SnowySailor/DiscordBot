@@ -44,14 +44,16 @@ async def on_ready():
 ### COMMANDS ###
 
 
-@client.command()
+@client.command(description="Echo your message")
 async def echo(*val: str):
+    """Echo your message"""
     await client.say(' '.join(str(x) for x in val))
     return
 
 
-@client.command()
+@client.command(description="Display a fortune from the unix `fortune` program")
 async def fortune():
+    """Display a fortune from the unix `fortune` program"""
     command = "fortune -e fortunes riddles literature"
     output = os.popen(command).read()
     output.strip()
