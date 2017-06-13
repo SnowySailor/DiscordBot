@@ -5,7 +5,7 @@ from modules.parseSettings import getSettings
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 
 bot = DiscordBot(getSettings())
-client = commands.Bot(command_prefix=bot.settings['prefix'], description="Bot")
+client = commands.Bot(command_prefix=commands.when_mentioned_or(bot.settings['prefix']), description="Bot")
 
 ### EVENTS ###
 
