@@ -5,7 +5,7 @@ import os
 
 def main(argv):
     if len(argv) < 3:
-        sys.exit("Not enough arguments. \nUsage: getlinecount.py FILE SENTENCELENGTH [GT/ET]\nGT finds lines with 'at least' SENTENCELENGTH words.\nET finds lines with exactly SENTENCELENGTH words.")
+        sys.exit("ERROR: Not enough arguments.\n\n"+str(getUsage()))
     file = argv[1]
     if not os.path.isfile(file):
         sys.exit("{} is not a valid file.".format(file))
@@ -13,7 +13,7 @@ def main(argv):
     try:
         length = int(argv[2])
     except ValueError:
-        sys.exit("Integer required as second argument. \nUsage: getlinecount.py FILE SENTENCELENGTH [GT/ET]\nGT finds lines with 'at least' SENTENCELENGTH words.\nET finds lines with exactly SENTENCELENGTH words.")
+        sys.exit("ERROR: Integer required as second argument.\n\n"+getUsage())
 
     count = 0
     with open(file, "r", encoding="utf-8", errors="ignore") as fileHandle:
@@ -27,5 +27,10 @@ def main(argv):
     if(len(argv) == 4 and argv[3] == 'ET'):
         print("Lines with exactly {} words in {}: {}".format(length, file, exactCount))
     return
+
+def getUsage():
+    return ("Usage: getlinecount.py FILE SENTENCELENGTH [GT/ET]\n"+
+           "GT finds lines with 'at least' SENTENCELENGTH words.\n"+
+           "ET finds lines with exactly SENTENCELENGTH words.")
 
 main(sys.argv)
