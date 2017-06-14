@@ -1,5 +1,10 @@
 import os
-from classes import DiscordBot
+import asyncio
+import itertools
+import random
+import string
+from threading import Timer
+from classes import DiscordBot, TimeDenum
 from discord.ext import commands
 from modules.parseSettings import getSettings
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
@@ -58,6 +63,73 @@ async def fortune():
     output = os.popen(command).read()
     output.strip()
     await client.say(output)
+    return
+
+@client.command(pass_context=True)
+async def timer(ctx, time=None, name=None):
+    def timerUsage():
+        return ("Usage: `timer XhYmZs [NAME]`\n"+
+                "Quotes also work: \"5 minutes 30 seconds\"")
+
+    def convertToSeconds(value, desc):
+        if desc == TimeDenum.S:
+            return value
+        if desc == TimeDenum.M:
+            return value*60
+        if desc == TimeDenum.H:
+            return value*3600
+
+    if not time:
+        await client.say("Not enough arguments.\n{}".format(timerUsage()))
+        return
+
+    validTimes = {'seconds': TimeDenum.S, 'second': TimeDenum.S, 
+                  'sec': TimeDenum.S, 's': TimeDenum.S, 'min': TimeDenum.M, 
+                  'minutes': TimeDenum.M, 'minute': TimeDenum.M,'m': TimeDenum.M, 
+                  'hours': TimeDenum.H, 'hour': TimeDenum.H, 'h': TimeDenum.H}
+    callingUser = ctx.message.author.id
+    timeSplit = [("".join(x)).strip() for _, x in itertools.groupby(time, key=str.isdigit)]
+    timeNum = 0
+    print(timeSplit)
+    try:
+        timeNum = int(timeSplit[0])
+    except ValueError:
+        await client.say("Unrecognized time: {}\n{}".format(
+                         time, timerUsage()))
+        return
+    if len(timeSplit) > 1:
+        timeNum = 0
+        count = 0
+        add = 0
+        desc = ""
+        while count < len(timeSplit):
+            try:
+                add = int(timeSplit[count])
+            except ValueError:
+                await client.say("Unrecognized time: {}\n{}".format(
+                                 time, timerUsage()))
+                return
+            if count+1 < len(timeSplit):
+                desc = timeSplit[count+1]
+                if desc.lower() in validTimes:
+                    timeNum += convertToSeconds(add, validTimes[desc.lower()])
+                else:
+                    await client.say("Unrecognized time multiplier: {}\n{}"
+                                     .format(desc, timerUsage()))
+                    return
+            else:
+                await client.say("Unexpected time termination: {}\n{}"
+                                 .format(time, timerUsage()))
+                return
+            count += 2
+        
+    expireTime = "{} seconds".format(timeNum)
+    if not name:
+        # Requires Python 3.6+
+        name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    await client.say("Timer called `{}` started. It will expire in {}.".format(name, expireTime))
+    await asyncio.sleep(timeNum)
+    await client.say("<@{}> Timer `{}` expired.".format(callingUser, name))
     return
 
 #######

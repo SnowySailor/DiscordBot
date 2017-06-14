@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from markovgen import Markov
 
 
@@ -25,3 +26,8 @@ class DiscordServer:
                 if i > 1:
                     print("Loaded data from file")
                     self.markov = Markov(f, settings['maxMarkovBytes'], False, settings['markovSentenceLength'])
+
+class TimeDenum(Enum):
+    S = 1
+    M = 2
+    H = 3

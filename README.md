@@ -10,3 +10,6 @@ Configure a config.yaml based on the example.
 1. Allow bot to join voice
 2. Configure audio playback
 3. Allow use with youtube-dl to play songs
+4. When reading in data, count the bytes as it is read in order to truly maximize the number of lines read in while still being under the max_bytes limit. If we are only reading in messages longer than 15 words, but we also have messages that are 5 words, we don't want to "use up" data with the 5 word messages. Use len(string.encode('utf-8')) to get byte length.
+5. Move the commands to a new file
+6. Perhaps make the timer command a little simpler by breaking it up into functions
