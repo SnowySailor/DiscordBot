@@ -127,6 +127,9 @@ async def timer(ctx, time=None, name=None):
     if not name:
         # Requires Python 3.6+
         name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    if 'maxTimerSeconds' in bot.settings and timeNum > bot.settings['maxTimerSeconds']:
+        await client.say("The time requested is too much. Please use a smaller number.")
+        return
     await client.say("Timer called `{}` started. It will expire in {}.".format(name, expireTime))
     await asyncio.sleep(timeNum)
     await client.say("<@{}> Timer `{}` expired.".format(callingUser, name))

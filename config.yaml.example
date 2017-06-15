@@ -1,6 +1,7 @@
 # Bot
 token: [discord bot token] # Your bot token from the online Discord bot page
 prefix: "$" # What people will say to call a bot command
+maxTimerSeconds: 10800 # Max time allowed on a timer. This is 3 hours.
 
 
 # Markov
