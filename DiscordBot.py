@@ -66,8 +66,8 @@ async def fortune():
     return
 
 @client.command(pass_context=True)
-"""Sets a timer. Usage: timer XhYmZs [NAME]"""
 async def timer(ctx, time=None, name=None):
+    """Sets a timer. Usage: timer XhYmZs [NAME]"""
     def timerUsage():
         return ("Usage: `timer XhYmZs [NAME]`\n"+
                 "Quotes also work: \"5 minutes 30 seconds\"")
