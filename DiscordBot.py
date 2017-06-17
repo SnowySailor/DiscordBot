@@ -3,14 +3,23 @@ import asyncio
 import itertools
 import random
 import string
-from threading import Timer
-from classes import DiscordBot, TimeDenum
+import discord
+import sys
+from classes import DiscordBot, TimeDenum, Music
 from discord.ext import commands
 from modules.parseSettings import getSettings
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 
 bot = DiscordBot(getSettings())
-client = commands.Bot(command_prefix=commands.when_mentioned_or(bot.settings['prefix']), description="Bot")
+client = commands.Bot(command_prefix=commands.when_mentioned_or(bot.settings['prefix']), 
+                      description="I am your best friend")
+client.add_cog(Music(client))
+
+if not discord.opus.is_loaded():
+    if 'opusLocation' in bot.settings:
+        discord.opus.load_opus(bot.settings['opusLocation'])
+    else:
+        sys.exit("Failed to find opusLocation in config.yaml")
 
 ### EVENTS ###
 

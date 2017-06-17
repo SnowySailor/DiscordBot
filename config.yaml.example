@@ -16,3 +16,6 @@ logNonAlphanumWords: False # Do you want to treat single-character words like # 
 logHttpLinks: False # Do you want to treat http links as real words?
 removeHereEveryone: True # Remove @here and @everyone from messages the bot logs
 removeUserMentions: False # Remove @User#Num mentions from text so users don't get pinged during markov calls
+
+#Opus
+opusLocation: "/usr/local/lib/libopus.so" # Example opus location on disc
