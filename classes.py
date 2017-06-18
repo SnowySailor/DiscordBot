@@ -30,7 +30,7 @@ class DiscordServer:
                     lengthRestriction = None
                     if 'markovDigestLength' in settings:
                         lengthRestriction = settings['markovDigestLength']
-                    if 'markovSentenceLength' in settings:
+                    else if 'markovSentenceLength' in settings:
                         lengthRestriction = settings['markovSentenceLength']
                     self.markov = Markov(f, settings['maxMarkovBytes'], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
