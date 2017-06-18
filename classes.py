@@ -27,8 +27,13 @@ class DiscordServer:
                         break
                 # We can load the markov if there are messages in the file
                 if i > 1:
-                    print("Loaded data from file")
-                    self.markov = Markov(f, settings['maxMarkovBytes'], False, settings['markovSentenceLength'])
+                    print("Loading data from file")
+                    lengthRestriction = None
+                    if 'markovDigestLength' in settings:
+                        lengthRestriction = settings['markovDigestLength']
+                    if 'markovSentenceLength' in settings:
+                        lengthRestriction = settings['markovSentenceLength']
+                    self.markov = Markov(f, settings['maxMarkovBytes'], False, lengthRestriction)
 
 class TimeDenum(Enum):
     S = 1

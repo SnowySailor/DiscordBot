@@ -12,6 +12,7 @@ maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each s
                         # If you know how many words you want to have stored, multiply that number by
                         # 5 (characters in each word) and you should get a number of bytes to use.
 markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
+markovDigestLength: 15 # Only add messages longer than this length to the current markov object
 logNonAlphanumWords: False # Do you want to treat single-character words like # or % as real words?
 logHttpLinks: False # Do you want to treat http links as real words?
 removeHereEveryone: True # Remove @here and @everyone from messages the bot logs

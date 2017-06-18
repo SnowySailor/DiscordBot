@@ -158,7 +158,11 @@ def logMessage(msg, bot):
         line = re.sub("\s?<@[0-9]+>\s", " ", line)
 
     # If the message is longer than the min sentence length we can process and log it
-    if len(line.split()) >= bot.settings['markovSentenceLength']:
+    lineLen = len(line.split())
+    if ('markovSentenceLength' in bot.settings and 
+            lineLen >= bot.settings['markovSentenceLength']) or
+            ('markovSentenceLength' not in bot.settings and lineLen >= 5):
+
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
             # Append the line to the file
@@ -168,7 +172,10 @@ def logMessage(msg, bot):
                 bot.markov[serverId] = DiscordServer(msg.server, bot.settings, 0)
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
-            bot.markov[serverId].markov.digest_single_message(line)
+            if ('markovDigestLength' in bot.settings and 
+                    lineLen <= bot.settings['markovDigestLength']) or
+                    ('markovDigestLength' not in bot.settings):
+                bot.markov[serverId].markov.digest_single_message(line)
 
         print("New message count for", serverId, "is", bot.markov[serverId].markov.line_size)
         print("Logged:", line)
