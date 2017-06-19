@@ -173,7 +173,7 @@ def logMessage(msg, bot):
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
             if (('markovDigestLength' in bot.settings and 
-                    lineLen <= bot.settings['markovDigestLength']) or
+                    lineLen >= bot.settings['markovDigestLength']) or
                     ('markovDigestLength' not in bot.settings)):
                 bot.markov[serverId].markov.digest_single_message(line)
 
