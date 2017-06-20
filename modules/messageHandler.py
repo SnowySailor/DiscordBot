@@ -106,9 +106,10 @@ async def handle(msg, bot, client):
 
     if re.match("^bot be random", msg.content, re.IGNORECASE):
         if msg.server.id not in bot.markov:
+            await client.send_message(msg.channel, "Loading data.")
             bot.markov[msg.server.id] = DiscordServer(msg.server, bot.settings, 1)
         if bot.markov[msg.server.id].markov.line_size < bot.settings['minMarkov']:
-            await client.send_message(msg.channel, "Not enough data")
+            await client.send_message(msg.channel, "Not enough data.")
             return
         if bot.markov[msg.server.id].markov is not None:
             text = bot.markov[msg.server.id].markov.generate_markov_text(random.randint(15, 40))
