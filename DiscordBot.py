@@ -26,9 +26,13 @@ if not discord.opus.is_loaded():
 
 @client.event
 async def on_message(msg):
-    await client.process_commands(msg)
-    if msg.author == client.user:
-        # Don't let the bot reply to itself
+    try:
+        await client.process_commands(msg)
+    except discord.ext.commands.errors.MissingRequiredArgument:
+        await client.send_message(msg.channel, "Errorz")
+    if msg.author == client.user or msg.author.bot:
+        # Don't let the bot reply to itself and if the sender is a bot
+        # then don't process that message. It could cause a loop.
         return
 
     # Server is None if the msg is a PM.
