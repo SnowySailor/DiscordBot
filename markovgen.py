@@ -22,25 +22,39 @@ class Markov(object):
                     self.database()
 
         def file_to_lines(self, max_size, min_length):
-            oversize = False
+            # oversize = False
 
-            # If the file is greater than the max size in the config file..
-            if os.stat(self.open_file.name).st_size > max_size:
-                # We only want to get the last max_size bytes from it
-                oversize = True
-                self.open_file.seek(-1 * max_size, os.SEEK_END)
-            else:
-                self.open_file.seek(0)
+            # # If the file is greater than the max size in the config file..
+            # if os.stat(self.open_file.name).st_size > max_size:
+            #     # We only want to get the last max_size bytes from it
+            #     oversize = True
+            #     self.open_file.seek(-1 * max_size, os.SEEK_END)
+            # else:
+            self.open_file.seek(0)
             data = self.open_file.read()
-            lines = data.split('\n')
+            # lines = data.split('\n')
+            lines = []
+            sizeRead = 0
+            for line in reversed(data.split('\n')):
+                lineSize = len(line.encode('utf-8'))
+                if sizeRead + lineSize > max_size:
+                    break
+                if min_length and len(line.split()) >= min_length:
+                    lines.append(line)
+                    sizeRead += lineSize
+                elif not min_length:
+                    lines.append(line)
+                    sizeRead += lineSize
+            print("Read in: ", lines)
+
             
-            if min_length:
-                # If there is a min length set, filter out lines that are less than this length
-                lines = [x for x in lines if len(x.split()) >= min_length]
-            if oversize:
-                # Quick and dirty way of removing the first line,
-                # which may or may not be truncated due to the byte limit
-                lines.pop(0)
+            # if min_length:
+            #     # If there is a min length set, filter out lines that are less than this length
+            #     lines = [x for x in lines if len(x.split()) >= min_length]
+            # if oversize:
+            #     # Quick and dirty way of removing the first line,
+            #     # which may or may not be truncated due to the byte limit
+            #     lines.pop(0)
             return lines
 
         def triples(self):
