@@ -107,17 +107,55 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
         #bot.servers[server.id] = DiscordServer(server, bot.defaultServerSettings)
         bot.addServer(server, bot.defaultServerSettings)
 
+    if mode.lower() == "list":
+        settingList = "\n".join(["`{}`".format(x) for x in bot.servers[server.id].keys()])
+        client.say("Here is a list of settings:\n{}".format(settingList))
+        return
+
     if not setting or not newVal:
-        if mode.lower() == "list":
-            settingList = "\n".join(["`{}`".format(x) for x in bot.servers[server.id].keys()])
-            client.say("Here is a list of settings:\n{}".format(settingList))
-            return
         client.say(modifyUsage())
         return
 
-    if setting not in bot.servers[server.id].settings:
-        client.say("This is not a valid setting. You can add it.\n{}"
-                   .format(modifyUsage()))
+    if mode.lower() == "add":
+        if setting in bot.server[server.id].settings:
+            # Setting is already in use
+            client.say("That is already a setting. You can modify it or remove it:\n{}"
+                       .format(modifyUsage()))
+            return
+        else
+            # This is a new setting
+            bot.servers[server.id].settings[setting] = newVal
+            bot.servers[server.id].saveSettingsState()
+            client.say("Setting `{}` added with value `{}`"
+                       .format(setting, newVal))
+            return
+
+    if mode.lower() == "change":
+        if setting not in bot.servers[server.id].settings:
+            # This is not a setting yet
+            client.say("This is not a valid setting. You can list the valid settings with `modifySetting list`")
+            return
+        else
+            # This is a setting we can change
+            oldVal = bot.servers[server.id].settings[setting]
+            bot.servers[server.id].settings[setting] = newVal
+            bot.servers[server.id].settings.saveSettingsState()
+            client.say("Setting `{}` changed from `{}` to `{}`."
+                       .format(setting, oldVal, newVal))
+            return
+
+    if mode.lower() == "remove":
+        if setting not in bot.servers[server.id].settings:
+            # Can't delete a setting we don't have
+            client.say("This is not a valid setting. You can list the valid settings with `modifySetting list`")
+            return
+        else
+            # Delete the setting
+            oldVal = bot.servers[server.id].settings[setting]
+            del bot.servers[server.id].settings[setting]
+            bot.servers[server.id].saveSettingsState()
+            client.say("Setting `{}` removed.")
+            return
 
     return
 

@@ -12,11 +12,6 @@ class DiscordBot:
         self.markov = dict()  # Dict of {serverId: DiscordServer}
         self.defaultServerSettings = settings
         self.servers = dict()
-        # Check to see if we have serialized data stored for servers
-        if os.path.isfile("data/servers.pickle"):
-            with open("data/servers.pickle", "rb") as f:
-                # Load the data into the servers variable
-                self.servers = pickle.load(f)
 
     def addServer(self, server, settings=None, messages=0):
         if server.id in self.servers:
@@ -26,11 +21,6 @@ class DiscordBot:
         self.servers[server.id] = DiscordServer(server, settings, messages)
         return
 
-    def saveSettingsState(self):
-        with open("data/servers.pickle", "wb") as f:
-            pickle.dump(self.servers, f)
-        return
-
 
 class DiscordServer:
     def __init__(self, server, settings, messages=0):
@@ -38,6 +28,13 @@ class DiscordServer:
         self.markov.line_size = messages
         # Holds individual settings for each server
         self.settings = settings
+        self.server = server
+
+        # Check to see if we have serialized data stored for this server
+        if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
+            with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
+                # Load the data into the servers variable
+                self.settings = pickle.load(f)
 
         # If the log exists, we can check to see how many lines it has
         if os.path.isfile("logs/{}_chat_log".format(server.id)):
@@ -56,6 +53,11 @@ class DiscordServer:
                         lengthRestriction = self.settings['markovSentenceLength']
                     self.markov = Markov(f, self.settings['maxMarkovBytes'], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
+
+    def saveSettingsState(self):
+        with open("data/{}_server_settings.pickle".format(self.server.id), "wb") as f:
+            pickle.dump(self.settings, f)
+        return
 
 class TimeDenum(Enum):
     S = 1
