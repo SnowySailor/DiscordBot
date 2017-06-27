@@ -4,8 +4,6 @@
 # Modified and added to by Nick Kanel: https://github.com/SnowySailor
 
 import random
-import os
-
 
 class Markov(object):
 

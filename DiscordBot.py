@@ -10,7 +10,12 @@ from discord.ext import commands
 from modules.parseSettings import getSettings
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 
-bot = DiscordBot(getSettings())
+# Perhaps there is a better way to manage this sort of thing
+# TODO: Remove the defaultSettings from going into the bot,
+#       make new attr that is 'token' only.
+defaultSettings = getSettings()
+defaultServerSettings = [(k,v) for (k,v) in defaultSettings if k != 'token']
+bot = DiscordBot(defaultSettings)
 client = commands.Bot(command_prefix=commands.when_mentioned_or(bot.settings['prefix']), 
                       description="I am your best friend")
 client.add_cog(Music(client))
@@ -26,10 +31,7 @@ if not discord.opus.is_loaded():
 
 @client.event
 async def on_message(msg):
-    try:
-        await client.process_commands(msg)
-    except discord.ext.commands.errors.MissingRequiredArgument:
-        await client.send_message(msg.channel, "Errorz")
+    await client.process_commands(msg)
     if msg.author == client.user or msg.author.bot:
         # Don't let the bot reply to itself and if the sender is a bot
         # then don't process that message. It could cause a loop.
@@ -40,6 +42,12 @@ async def on_message(msg):
     if msg.server == None:
         await handlePersonalMessage(msg, bot, client)
         return
+
+    # Check to see if the server is registered in the bot
+    if msg.server.id not in bot.servers:
+        # Add a new server to the server dict.
+        #bot.servers[msg.server.id] = DiscordServer(msg.server, bot.defaultServerSettings)
+        bot.addServer(msg.server, bot.defaultServerSettings)
 
     # If the bot was mentioned directly handle that in a special way
     if msg.content.startswith("<@{}>".format(client.user.id)):
@@ -76,6 +84,46 @@ async def fortune():
     output = os.popen(command).read()
     output.strip()
     await client.say(output)
+    return
+
+@client.command(pass_context=True, no_pm=True)
+async def modifySetting(ctx, mode=None, setting=None, newVal=None):
+    """Allows changing of server settings"""
+    def modifyUsage():
+        return ("Usage: `modifySetting change SETTING NEWVAL`\n"+
+                "`modifySetting list` to list settings\n"+
+                "`modifySetting add SETTING VAL`\n"+
+                "`modifySetting remove SETTING`\n")
+    server = ctx.message.server
+
+    # Permissions check
+    # TODO: Allow admins to specify roles that can change bot settings
+    # MAYBE TODO: If role is updated, give server admin a warning
+    if not ctx.message.author.administrator:
+        client.say("You are not an administrator and cannot change my settings.")
+        return
+    # Make sure the server exists in our bot
+    if server.id not in bot.servers:
+        #bot.servers[server.id] = DiscordServer(server, bot.defaultServerSettings)
+        bot.addServer(server, bot.defaultServerSettings)
+
+    if not setting or not newVal:
+        if mode.lower() == "list":
+            settingList = "\n".join(["`{}`".format(x) for x in bot.servers[server.id].keys()])
+            client.say("Here is a list of settings:\n{}".format(settingList))
+            return
+        client.say(modifyUsage())
+        return
+
+    if setting not in bot.servers[server.id].settings:
+        client.say("This is not a valid setting. You can add it.\n{}"
+                   .format(modifyUsage()))
+
+    return
+
+# TODO: Write
+@client.command(pass_context=True, no_pm=True)
+async def modifyReaction(ctx, reaction=None, regex=None, reply=None):
     return
 
 @client.command(pass_context=True)
@@ -148,6 +196,12 @@ async def timer(ctx, time=None, name=None):
     await asyncio.sleep(timeNum)
     await client.say("<@{}> Timer `{}` expired.".format(callingUser, name))
     return
+
+# @client.command(description="Server info")
+# async def serverinfo():
+#     output = os.popen('serverinfo.sh').read()
+#     output.strip()
+#     return output
 
 #######
 
