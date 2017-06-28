@@ -8,7 +8,7 @@ async def handle(msg, bot, client):
     if 'markovEnable' in bot.settings and bot.settings['markovEnable']:
         logMessage(msg, bot)
 
-    if 'messageReactions' in bot.settings and bot.settings['messageReactions']:
+    if 'reactionsEnable' in bot.settings and bot.settings['reactionsEnable']:
         await reactToMessages(msg, bot, client)
     return
 

@@ -99,8 +99,8 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
     # Permissions check
     # TODO: Allow admins to specify roles that can change bot settings
     # MAYBE TODO: If role is updated, give server admin a warning
-    if not ctx.message.author.administrator:
-        client.say("You are not an administrator and cannot change my settings.")
+    if not ctx.message.author.manage_server:
+        client.say("You are not a server manager and cannot change my settings.")
         return
     # Make sure the server exists in our bot
     if server.id not in bot.servers:
@@ -108,10 +108,12 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
         bot.addServer(server, bot.defaultServerSettings)
 
     if mode.lower() == "list":
+        # TODO: Need to come up with a good way to display in table
         settingList = "\n".join(["`{}`".format(x) for x in bot.servers[server.id].keys()])
         client.say("Here is a list of settings:\n{}".format(settingList))
         return
 
+    # TODO: Fix because remove won't ever be able to trigger
     if not setting or not newVal:
         client.say(modifyUsage())
         return
@@ -129,8 +131,7 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
             client.say("Setting `{}` added with value `{}`"
                        .format(setting, newVal))
             return
-
-    if mode.lower() == "change":
+    elif mode.lower() == "change":
         if setting not in bot.servers[server.id].settings:
             # This is not a setting yet
             client.say("This is not a valid setting. You can list the valid settings with `modifySetting list`")
@@ -143,8 +144,7 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
             client.say("Setting `{}` changed from `{}` to `{}`."
                        .format(setting, oldVal, newVal))
             return
-
-    if mode.lower() == "remove":
+    elif mode.lower() == "remove":
         if setting not in bot.servers[server.id].settings:
             # Can't delete a setting we don't have
             client.say("This is not a valid setting. You can list the valid settings with `modifySetting list`")
@@ -156,12 +156,59 @@ async def modifySetting(ctx, mode=None, setting=None, newVal=None):
             bot.servers[server.id].saveSettingsState()
             client.say("Setting `{}` removed.")
             return
-
+    else:
+        client.say("Unrecognized modification mode.\n{}".format(modifyReactionUsage()))
+        return
     return
 
 # TODO: Write
 @client.command(pass_context=True, no_pm=True)
-async def modifyReaction(ctx, reaction=None, regex=None, reply=None):
+async def modifyReaction(ctx, mode=None, reaction=None, regex=None, reply=None, probability=None):
+    def modifyReactionUsage():
+        return ("Usage: `modifyReaction change NAME [regex|reply|probability] NEWVALUE`\n"+
+                "`modifyReaction list` to list settings\n"+
+                "`modifyReaction add NAME REGEX REPLY PROBABILITY`\n"+
+                "`modifyReaction remove NAME`\n")
+
+    # Permissions check
+    # TODO: Allow admins to specify roles that can change bot settings
+    # MAYBE TODO: If role is updated, give server admin a warning
+    if not ctx.message.author.manage_server:
+        client.say("You are not a server manager and cannot change my settings.")
+        return
+
+    if mode.lower() == "list":
+        # TODO: Need to come up with a good way to display in table
+        return
+    elif mode.lower() == "add":
+        if not reaction or not regex or not reply or not probability:
+            client.say("Improper parameters.\n{}".format(modifyReactionUsage()))
+            return
+        if regex.lower()
+        return
+    elif mode.lower() == "change":
+        if not reaction or not regex or not reply:
+            client.say("Improper parameters.\n{}".format(modifyReactionUsage()))
+            return
+        if regex.lower() == "regex":
+            return
+        elif regex.lower() == "reply":
+            return
+        elif regex.lower() == "probability":
+            return
+        else:
+            client.say("Unrecognized key.\n{}".format(modifyReactionUsage()))
+            return
+        return
+    elif mode.lower() == "remove":
+        if not reaction:
+            client.say("Improper parameters.\n{}".format(modifyReactionUsage()))
+            return
+        
+        return
+    else:
+        client.say("Unrecognized modification mode.\n{}".format(modifyReactionUsage()))
+        return
     return
 
 @client.command(pass_context=True)

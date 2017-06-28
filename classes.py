@@ -28,6 +28,7 @@ class DiscordServer:
         self.markov.line_size = messages
         # Holds individual settings for each server
         self.settings = settings
+        self.reactions = dict()
         self.server = server
 
         # Check to see if we have serialized data stored for this server
@@ -35,6 +36,10 @@ class DiscordServer:
             with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
                 # Load the data into the servers variable
                 self.settings = pickle.load(f)
+        if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
+            with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
+                # Load the data into the reactions variable
+                self.reactions = pickle.load(f)
 
         # If the log exists, we can check to see how many lines it has
         if os.path.isfile("logs/{}_chat_log".format(server.id)):
@@ -57,6 +62,11 @@ class DiscordServer:
     def saveSettingsState(self):
         with open("data/{}_server_settings.pickle".format(self.server.id), "wb") as f:
             pickle.dump(self.settings, f)
+        return
+        
+    def saveReactionsState(self):
+        with open("data/{}_reactions.pickle".format(self.server.id), "wb") as f:
+            pickle.dump(self.reactions, f)
         return
 
 class TimeDenum(Enum):
