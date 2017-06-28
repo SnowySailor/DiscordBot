@@ -11,6 +11,8 @@ Configure a config.yaml based on the example.
 2. Discord.py library
 3. PyYAML library
 4. youtube_dl library
+5. Opus Library
+6. ffmpeg
 
 # TODO
 1. Move the commands to a new file
@@ -20,3 +22,4 @@ Configure a config.yaml based on the example.
 5. Enable/Disable image reactions
 6. Allow moderators in servers to change probability of reactions (serialize data and store to DB/file)
 7. Allow moderators in servers to add/remove reactions (serialize data and store to DB/file)
+8. Come up with a way to store default reactions for a server.
