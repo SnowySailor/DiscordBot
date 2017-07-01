@@ -204,7 +204,7 @@ async def modifyReaction(ctx, mode=None, reaction=None, regex=None, reply=None, 
         if not reaction:
             client.say("Improper parameters.\n{}".format(modifyReactionUsage()))
             return
-        
+        # TODO: Creat a way to store reactions in the server object
         return
     else:
         client.say("Unrecognized modification mode.\n{}".format(modifyReactionUsage()))
