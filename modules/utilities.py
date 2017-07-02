@@ -1,11 +1,12 @@
 import re
+from discord.ext import commands
 
 def cleanMessage(line, bot):
-    if 'logNonAlphanumWords' in bot.settings and not bot.settings['logNonAlphanumWords']:
+    if 'removeNonAlphanumWords' in bot.settings and bot.settings['removeNonAlphanumWords']:
         # We don't want to log non-alphanumeric characters because something like
         # % or & or # isn't really a valuable word.
         line = re.sub("\s\W\s", " ", line)
-    if 'logHttpLinks' in bot.settings and not bot.settings['logHttpLinks']:
+    if 'removeHttpLinks' in bot.settings and bot.settings['removeHttpLinks']:
         # If we don't want to log http links, we can remove them with regex
         line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
     if 'removeHereEveryone' in bot.settings and bot.settings['removeHereEveryone']:
@@ -49,3 +50,28 @@ def logMessage(msg, bot):
         print("New message count for", serverId, "is", bot.markov[serverId].markov.line_size)
         print("Logged:", line)
     return
+
+# Check to see if a user has the proper permissions to do something
+# Takes as many permissions as necessary
+def needsPermissions(*permissions):
+    def predicate(ctx):
+        if ctx.message.server is None:
+            return False
+        permissionConfirmations = []
+        # Loop over the permissions we got
+        for perm in permissions:
+            # Check to see if the user has the permission
+            ctx.message.author.server_permissions.get(perm, False)
+        if not all(permissionConfirmations):
+            ctx.bot.say("""You are not a server manager and cannot
+                        change my settings.""")
+            return all(permissionConfirmations)
+    return commands.check(predicate)
+
+# Use if the command requires the server to be in the bot
+def requireServer():
+    def predicate(ctx):
+        # Make sure the server exists in our bot
+        if ctx.message.server.id not in self.bot.servers:
+            self.bot.addServer(ctx.message.server, self.bot.defaultServerSettings)
+    return commands.check(predicate)

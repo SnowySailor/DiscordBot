@@ -1,24 +1,26 @@
 # Bot
-token: [discord bot token] # Your bot token from the online Discord bot page
-prefix: "$" # What people will say to call a bot command
-maxTimerSeconds: 10800 # Max time allowed on a timer. This is 3 hours.
-reactionsEnable: True # Do you want to enable message reactions?
-
+bot:
+  token: BOT_TOKEN # Your bot token from the online Discord bot page
+  prefix: "$" # What people will say to call a bot command
+  opusLocation: "/usr/local/lib/libopus.so" # Example opus location on disc
 
 # Markov
-markovEnable: True # Do you want to have markov enabled?
-minMarkov: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
-maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
-                        # to put this into reference, the average word length is 5 characters. Most words
-                        # written will just be aschii characters which utf-8 sees as 1 byte.
-                        # If you know how many words you want to have stored, multiply that number by
-                        # 5 (characters in each word) and you should get a number of bytes to use.
-markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
-markovDigestLength: 15 # Only add messages longer than this length to the current markov object
-logNonAlphanumWords: False # Do you want to treat single-character words like # or % as real words?
-logHttpLinks: False # Do you want to treat http links as real words?
-removeHereEveryone: True # Remove @here and @everyone from messages the bot logs
-removeUserMentions: False # Remove @User#Num mentions from text so users don't get pinged during markov calls
+markov:
+  markovEnable: True # Do you want to have markov enabled?
+  minMarkov: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
+  maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
+                          # to put this into reference, the average word length is 5 characters. Most words
+                          # written will just be aschii characters which utf-8 sees as 1 byte.
+                          # If you know how many words you want to have stored, multiply that number by
+                          # 5 (characters in each word) and you should get a number of bytes to use.
+  markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
+  markovDigestLength: 15 # Only add messages longer than this length to the current markov object
+  removeNonAlphanumWords: True # Do you want to treat single-character words like # or % as real words?
+  removeHttpLinks: True # Do you want to treat http links as real words?
+  removeHereEveryone: True # Remove @here and @everyone from messages the bot logs
+  removeUserMentions: False # Remove @User#Num mentions from text so users don't get pinged during markov calls
 
-#Opus
-opusLocation: "/usr/local/lib/libopus.so" # Example opus location on disc
+# General settings
+settings:
+  maxTimerSeconds: 10800 # Max time allowed on a timer in seconds. This is 3 hours.
+  reactionsEnable: True # Do you want to enable message reactions?

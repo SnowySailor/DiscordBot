@@ -15,10 +15,14 @@ from modules.parseSettings import getSettings
 # TODO: Remove the defaultSettings from going into the bot,
 #       make new attr that is 'token' only.
 defaultSettings = getSettings()
-defaultServerSettings = [(k, v) for (k, v) in defaultSettings if k != 'token']
-bot = DiscordBot(defaultSettings)
+token = defaultSettings['token']
+defaultServerSettings = dict()
+for k, v in defaultSettings.items():
+    if k != 'token':
+        defaultServerSettings[k] = v
+bot = DiscordBot(defaultServerSettings, token)
 client = commands.Bot(command_prefix=commands
-                      .when_mentioned_or(bot.settings['prefix']), 
+                      .when_mentioned_or(bot.defaultServerSettings['prefix']), 
                       description="I am your best friend")
 
 client.add_cog(Music(client))
@@ -39,7 +43,5 @@ if not discord.opus.is_loaded():
 #     output.strip()
 #     return output
 
-#######
-
 # Bot token from config.yaml
-client.run(bot.settings['token'])
+client.run(bot.token)

@@ -1,4 +1,5 @@
 from discord.ext import commands
+from modules.utilities import needsPermissions, requireServer
 
 
 class SettingsCommands:
@@ -6,7 +7,10 @@ class SettingsCommands:
         self.client = client
         self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True)
+    #@commands.command(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, no_pm=True)
+    @needsPermissions('manage_server')
+    @requireServer()
     async def modifySetting(self, ctx, mode=None, setting=None, newVal=None):
         """Allows changing of server settings"""
         def modifyUsage():
@@ -14,80 +18,80 @@ class SettingsCommands:
                     `modifySetting list` to list settings\n
                     `modifySetting add SETTING VAL`\n
                     `modifySetting remove SETTING`\n""")
-        server = ctx.message.server
 
         # Permissions check
         # TODO: Allow admins to specify roles that can change bot settings
         # MAYBE TODO: If role is updated, give server admin a warning
-        if not ctx.message.author.manage_server:
-            self.client.say("""You are not a server manager and cannot
-                             change my settings.""")
-            return
-        # Make sure the server exists in our bot
-        if server.id not in self.bot.servers:
-            self.bot.addServer(server, self.bot.defaultServerSettings)
 
-        if mode.lower() == "list":
-            # TODO: Need to come up with a good way to display in table
-            settingList = "\n".join(["`{}`".format(x) for x in
-                                     self.bot.servers[server.id].keys()])
-            self.client.say("Here is a list of settings:\n{}"
-                            .format(settingList))
-            return
-
-        # TODO: Fix because remove won't ever be able to trigger
-        if not setting or not newVal:
-            self.client.say(modifyUsage())
-            return
-
-        if mode.lower() == "add":
-            if setting in self.bot.server[server.id].settings:
-                # Setting is already in use
-                self.client.say("""That is already a setting. You can modify
-                                 it or remove it:\n{}""".format(modifyUsage()))
-                return
-            else:
-                # This is a new setting
-                self.bot.servers[server.id].settings[setting] = newVal
-                self.bot.servers[server.id].saveSettingsState()
-                self.client.say("Setting `{}` added with value `{}`"
-                                .format(setting, newVal))
-                return
-        elif mode.lower() == "change":
-            if setting not in self.bot.servers[server.id].settings:
-                # This is not a setting yet
-                self.client.say("""This is not a valid setting. You can list
-                 the valid settings with `modifySetting list`""")
-                return
-            else:
-                # This is a setting we can change
-                oldVal = self.bot.servers[server.id].settings[setting]
-                self.bot.servers[server.id].settings[setting] = newVal
-                self.bot.servers[server.id].settings.saveSettingsState()
-                self.client.say("Setting `{}` changed from `{}` to `{}`."
-                                .format(setting, oldVal, newVal))
-                return
-        elif mode.lower() == "remove":
-            if setting not in self.bot.servers[server.id].settings:
-                # Can't delete a setting we don't have
-                self.client.say("""This is not a valid setting. You can list the
-                 valid settings with `modifySetting list`""")
-                return
-            else:
-                # Delete the setting
-                oldVal = self.bot.servers[server.id].settings[setting]
-                del self.bot.servers[server.id].settings[setting]
-                self.bot.servers[server.id].saveSettingsState()
-                self.client.say("Setting `{}` removed.")
-                return
-        else:
+        if ctx.invoked_subcommands is None:
             self.client.say("Unrecognized modification mode.\n{}"
                             .format(modifyUsage()))
             return
         return
 
+    @modifySetting.command(pass_context=True, no_pm=True)
+    async def add(self, ctx, setting, val):
+        server = ctx.message.server
+        if setting in self.bot.server[server.id].settings:
+            # Setting is already in use
+            self.client.say("""That is already a setting. You can modify
+                             it or remove it:\n{}""".format(modifyUsage()))
+            return
+        else:
+            # This is a new setting
+            self.bot.servers[server.id].settings[setting] = val
+            self.bot.servers[server.id].saveSettingsState()
+            self.client.say("Setting `{}` added with value `{}`"
+                            .format(setting, val))
+            return
+        return
+
+    @modifySetting.command(pass_context=True, no_pm=True)
+    async def list(self, ctx):
+        server = ctx.message.server
+        # TODO: Need to come up with a good way to display in table
+        settingList = "\n".join(["`{}`".format(x) for x in
+                                 self.bot.servers[server.id].keys()])
+        self.client.say("Here is a list of settings:\n{}"
+                        .format(settingList))
+        return
+
+    @modifySetting.command(pass_context=True, no_pm=True)
+    async def change(self, ctx, setting, newVal):
+        server = ctx.message.server
+        if setting not in self.bot.servers[server.id].settings:
+            # This is not a setting yet
+            self.client.say("""This is not a valid setting. You can list
+             the valid settings with `modifySetting list`""")
+            return
+        else:
+            # This is a setting we can change
+            oldVal = self.bot.servers[server.id].settings[setting]
+            self.bot.servers[server.id].settings[setting] = newVal
+            self.bot.servers[server.id].settings.saveSettingsState()
+            self.client.say("Setting `{}` changed from `{}` to `{}`."
+                            .format(setting, oldVal, newVal))
+            return
+
+    @modifySetting.command(pass_context=True, no_pm=True)
+    async def remove(self, ctx, setting):
+        server = ctx.message.server
+        if setting not in self.bot.servers[server.id].settings:
+            # Can't delete a setting we don't have
+            self.client.say("""This is not a valid setting. You can list the
+             valid settings with `modifySetting list`""")
+            return
+        else:
+            # Delete the setting
+            oldVal = self.bot.servers[server.id].settings[setting]
+            del self.bot.servers[server.id].settings[setting]
+            self.bot.servers[server.id].saveSettingsState()
+            self.client.say("Setting `{}` removed.")
+            return
+
     # TODO: Write
     @commands.command(pass_context=True, no_pm=True)
+    @needsPermissions('manage_server')
     async def modifyReaction(self, ctx, mode=None, reaction=None, regex=None,
                              reply=None, probability=None):
         def modifyReactionUsage():
@@ -100,7 +104,7 @@ class SettingsCommands:
         # Permissions check
         # TODO: Allow admins to specify roles that can change bot settings
         # MAYBE TODO: If role is updated, give server admin a warning
-        if not ctx.message.author.manage_server:
+        if not ctx.message.author.server_permissions.manage_server:
             self.client.say("""You are not a server manager and cannot change
                             my settings.""")
             return

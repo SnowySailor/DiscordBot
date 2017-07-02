@@ -5,10 +5,11 @@ from markovgen import Markov
 
 
 class DiscordBot:
-    def __init__(self, settings):
+    def __init__(self, settings, token):
         self.markov = dict()  # Dict of {serverId: DiscordServer}
         self.defaultServerSettings = settings
         self.servers = dict()
+        self.token = token
 
     def addServer(self, server, settings=None, messages=0):
         if server.id in self.servers:

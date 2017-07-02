@@ -1,4 +1,4 @@
-from clases import TimeDenum
+from classes import TimeDenum
 from discord.ext import commands
 import itertools
 import string

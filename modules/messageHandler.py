@@ -1,4 +1,4 @@
-from modules.messageResponder import reactToMessages
+import modules.messageResponder
 from modules.utilities import logMessage
 
 # This function should contain only message responses to what users say
@@ -21,4 +21,3 @@ async def handlePersonalMessage(msg, bot, client):
 # This function should contain what to do when the bot is mentioned
 async def handleBotMention(msg, bot, client):
     return
-    
