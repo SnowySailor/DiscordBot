@@ -2,7 +2,6 @@ import re
 import random
 import os
 from classes import DiscordServer
-from utilities import cleanMessage
 
 
 # Handles message reactions

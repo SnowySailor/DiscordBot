@@ -21,3 +21,4 @@ async def handlePersonalMessage(msg, bot, client):
 # This function should contain what to do when the bot is mentioned
 async def handleBotMention(msg, bot, client):
     return
+    

@@ -1,5 +1,4 @@
 import re
-from classes import DiscordServer
 
 def cleanMessage(line, bot):
     if 'logNonAlphanumWords' in bot.settings and not bot.settings['logNonAlphanumWords']:
