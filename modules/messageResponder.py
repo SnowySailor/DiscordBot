@@ -104,12 +104,12 @@ async def reactToMessage(msg, bot, client):
         await client.send_message(msg.channel, "Isn't it obvious? I'm best pony.")
         return
 
-    if ('markovEnable' in bot.settings and bot.settings['markovEnable'] and
+    if ('markovEnable' in bot.settings['markov'] and bot.settings['markov']['markovEnable'] and
             re.match("^bot be random", msg.content, re.IGNORECASE)):
         if msg.server.id not in bot.markov:
             await client.send_message(msg.channel, "Loading data.")
             bot.markov[msg.server.id] = DiscordServer(msg.server, bot.settings, 1)
-        if bot.markov[msg.server.id].markov.line_size < bot.settings['minMarkov']:
+        if bot.markov[msg.server.id].markov.line_size < bot.settings['markov']['minMarkov']:
             await client.send_message(msg.channel, "Not enough data.")
             return
         if bot.markov[msg.server.id].markov is not None:

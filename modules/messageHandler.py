@@ -5,7 +5,7 @@ from modules.utilities import logMessage
 # It should not contain actual commands or utilities.
 async def handle(msg, bot, client):
     # Log the message for the markov bot
-    if 'markovEnable' in bot.settings and bot.settings['markovEnable']:
+    if 'markovEnable' in bot.settings['markov'] and bot.settings['markov']['markovEnable']:
         logMessage(msg, bot)
 
     if 'reactionsEnable' in bot.settings and bot.settings['reactionsEnable']:

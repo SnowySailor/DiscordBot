@@ -5,11 +5,11 @@ from markovgen import Markov
 
 
 class DiscordBot:
-    def __init__(self, settings, token):
+    def __init__(self, settings, botSettings):
         self.markov = dict()  # Dict of {serverId: DiscordServer}
         self.defaultServerSettings = settings
+        self.botSettings = botSettings
         self.servers = dict()
-        self.token = token
 
     def addServer(self, server, settings=None, messages=0):
         if server.id in self.servers:
@@ -50,11 +50,11 @@ class DiscordServer:
                 # We can load the markov if there are messages in the file
                 if i > 1:
                     lengthRestriction = None
-                    if 'markovDigestLength' in self.settings:
-                        lengthRestriction = self.settings['markovDigestLength']
+                    if 'markovDigestLength' in self.settings['markov']:
+                        lengthRestriction = self.settings['markov']['markovDigestLength']
                     elif 'markovSentenceLength' in settings:
-                        lengthRestriction = self.settings['markovSentenceLength']
-                    self.markov = Markov(f, self.settings['maxMarkovBytes'], False, lengthRestriction)
+                        lengthRestriction = self.settings['markov']['markovSentenceLength']
+                    self.markov = Markov(f, self.settings['markov']['maxMarkovBytes'], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
     def saveSettingsState(self):

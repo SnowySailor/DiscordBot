@@ -14,15 +14,13 @@ from modules.parseSettings import getSettings
 # Perhaps there is a better way to manage this sort of thing
 # TODO: Remove the defaultSettings from going into the bot,
 #       make new attr that is 'token' only.
-defaultSettings = getSettings()
-token = defaultSettings['token']
-defaultServerSettings = dict()
-for k, v in defaultSettings.items():
-    if k != 'token':
-        defaultServerSettings[k] = v
-bot = DiscordBot(defaultServerSettings, token)
+parsedSettings = getSettings()
+botSettings = parsedSettings['bot']
+defaultServerSettings = parsedSettings['serverSettings']
+
+bot = DiscordBot(defaultServerSettings, botSettings)
 client = commands.Bot(command_prefix=commands
-                      .when_mentioned_or(bot.defaultServerSettings['prefix']), 
+                      .when_mentioned_or(bot.botSettings['prefix']), 
                       description="I am your best friend")
 
 client.add_cog(Music(client))
@@ -32,8 +30,8 @@ client.add_cog(MiscCommands(client, bot))
 client.add_cog(BotEvents(client, bot))
 
 if not discord.opus.is_loaded():
-    if 'opusLocation' in bot.settings:
-        discord.opus.load_opus(bot.settings['opusLocation'])
+    if 'opusLocation' in bot.botSettings:
+        discord.opus.load_opus(bot.botSettings['opusLocation'])
     else:
         sys.exit("Failed to find opusLocation in config.yaml")
 
@@ -44,4 +42,4 @@ if not discord.opus.is_loaded():
 #     return output
 
 # Bot token from config.yaml
-client.run(bot.token)
+client.run(bot.botSettings['token'])

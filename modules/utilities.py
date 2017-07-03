@@ -2,18 +2,18 @@ import re
 from discord.ext import commands
 
 def cleanMessage(line, bot):
-    if 'removeNonAlphanumWords' in bot.settings and bot.settings['removeNonAlphanumWords']:
+    if 'removeNonAlphanumWords' in bot.settings['markov'] and bot.settings['markov']['removeNonAlphanumWords']:
         # We don't want to log non-alphanumeric characters because something like
         # % or & or # isn't really a valuable word.
         line = re.sub("\s\W\s", " ", line)
-    if 'removeHttpLinks' in bot.settings and bot.settings['removeHttpLinks']:
+    if 'removeHttpLinks' in bot.settings['markov'] and bot.settings['markov']['removeHttpLinks']:
         # If we don't want to log http links, we can remove them with regex
         line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
-    if 'removeHereEveryone' in bot.settings and bot.settings['removeHereEveryone']:
+    if 'removeHereEveryone' in bot.settings['markov'] and bot.settings['markov']['removeHereEveryone']:
         # If we don't want @here and @everyone recorded, we can remove them
         line = re.sub("\@(here|everyone)\s", "", line)
         line = re.sub("\s\@(here|everyone)", "", line)
-    if 'removeUserMentions' in bot.settings and bot.settings['removeUserMentions']:
+    if 'removeUserMentions' in bot.settings['markov'] and bot.settings['markov']['removeUserMentions']:
         # If we don't want @User#Num mentions, we can remove them
         # User mentions are <@69683046830462454> in text as an example
         line = re.sub("\s?<@[0-9]+>\s", " ", line)
@@ -28,9 +28,9 @@ def logMessage(msg, bot):
 
     # If the message is longer than the min sentence length we can process and log it
     lineLen = len(line.split())
-    if (('markovSentenceLength' in bot.settings and
-            lineLen >= bot.settings['markovSentenceLength']) or
-            ('markovSentenceLength' not in bot.settings and lineLen >= 5)):
+    if (('markovSentenceLength' in bot.settings['markov'] and
+            lineLen >= bot.settings['markov']['markovSentenceLength']) or
+            ('markovSentenceLength' not in bot.settings['markov'] and lineLen >= 5)):
 
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
@@ -42,9 +42,9 @@ def logMessage(msg, bot):
                 bot.addServer(msg.server, bot.defaultServerSettings, 0)
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
-            if (('markovDigestLength' in bot.settings and
-                    lineLen >= bot.settings['markovDigestLength']) or
-                    ('markovDigestLength' not in bot.settings)):
+            if (('markovDigestLength' in bot.settings['markov'] and
+                    lineLen >= bot.settings['markov']['markovDigestLength']) or
+                    ('markovDigestLength' not in bot.settings['markov'])):
                 bot.markov[serverId].markov.digest_single_message(line)
 
         print("New message count for", serverId, "is", bot.markov[serverId].markov.line_size)
@@ -73,5 +73,6 @@ def requireServer():
     def predicate(ctx):
         # Make sure the server exists in our bot
         if ctx.message.server.id not in self.bot.servers:
-            self.bot.addServer(ctx.message.server, self.bot.defaultServerSettings)
+            self.bot.addServer(ctx.message.server,
+            				   self.bot.defaultServerSettings)
     return commands.check(predicate)
