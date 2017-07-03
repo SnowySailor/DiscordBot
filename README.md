@@ -17,15 +17,14 @@ Configure a config.yaml based on the example.
 
 # TODO
 1. Perhaps make the timer command a little simpler by breaking it up into functions
-2. Allow moderators in servers to customize markovSentenceLength and markovDigestLength
+2. Allow moderators in servers to customize server settings
 3. Come up with way to have bot auto leave voice if it is the only user. on_voice_state_update might be the right direction.
-4. Enable/Disable image reactions
-5. Allow moderators in servers to change probability of reactions (serialize data and store to DB/file). Look into subcommands.
-6. Allow moderators in servers to add/remove reactions (serialize data and store to DB/file)
-7. Come up with a way to store default reactions for a server.
-8. Spam message filter
+4. Allow moderators in servers to change probability of reactions (serialize data and store to DB/file). Look into subcommands.
+5. Allow moderators in servers to add/remove reactions (serialize data and store to DB/file)
+6. Come up with a way to store default reactions for a server.
+7. Spam message filter
   * Use redis to monitor number of messages a user has sent in X seconds
   * Delete messages (option) if they exceed a certain number in X seconds
-9. Spam prevention
+8. Spam prevention
   * Place user into timeout group that doesn't allow messages to be sent (option) if they spam
   * Message moderators/admins

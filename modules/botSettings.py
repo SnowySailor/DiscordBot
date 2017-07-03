@@ -51,7 +51,7 @@ class SettingsCommands:
         server = ctx.message.server
         # TODO: Need to come up with a good way to display in table
         settingList = "\n".join(["`{}`".format(x) for x in
-                                 self.bot.servers[server.id].keys()])
+                                 self.bot.servers[server.id].settings.keys()])
         self.client.say("Here is a list of settings:\n{}"
                         .format(settingList))
         return
