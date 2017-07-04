@@ -1,7 +1,6 @@
 import re
 import random
 import os
-from classes import DiscordServer
 
 
 # Handles message reactions
@@ -77,7 +76,7 @@ async def reactToMessage(msg, bot, client):
         return
 
     if re.match(".*(tomato)", msg.content, re.IGNORECASE):
-        s = random.randing(0, 2)
+        s = random.randint(0, 2)
         if(s == 1):
             await client.send_message(msg.channel, "http://i.imgur.com/RVgzWvi.jpg")
         return
@@ -104,16 +103,18 @@ async def reactToMessage(msg, bot, client):
         await client.send_message(msg.channel, "Isn't it obvious? I'm best pony.")
         return
 
-    if ('markovEnable' in bot.settings['markov'] and bot.settings['markov']['markovEnable'] and
-            re.match("^bot be random", msg.content, re.IGNORECASE)):
-        if msg.server.id not in bot.markov:
-            await client.send_message(msg.channel, "Loading data.")
-            bot.markov[msg.server.id] = DiscordServer(msg.server, bot.settings, 1)
-        if bot.markov[msg.server.id].markov.line_size < bot.settings['markov']['minMarkov']:
+    if ('markovEnable' in bot.servers[msg.server.id].settings['markov'] 
+            and bot.servers[msg.server.id].settings['markov']['markovEnable'] 
+            and re.match("^bot be random", msg.content, re.IGNORECASE)):
+        # if msg.server.id not in bot.servers:
+        #     await client.send_message(msg.channel, "Loading data.")
+        #     bot.addServer(msg.server, bot.defaultServerSettings)
+        if (bot.servers[msg.server.id].markov.line_size < 
+                bot.servers[msg.server.id].settings['markov']['minMarkov']):
             await client.send_message(msg.channel, "Not enough data.")
             return
-        if bot.markov[msg.server.id].markov is not None:
-            text = bot.markov[msg.server.id].markov.generate_markov_text(random.randint(15, 40))
+        if bot.servers[msg.server.id].markov is not None:
+            text = bot.servers[msg.server.id].markov.generate_markov_text(random.randint(15, 40))
         await client.send_message(msg.channel, text)
         return
 

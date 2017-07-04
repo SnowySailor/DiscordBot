@@ -6,7 +6,6 @@ from markovgen import Markov
 
 class DiscordBot:
     def __init__(self, settings, botSettings):
-        self.markov = dict()  # Dict of {serverId: DiscordServer}
         self.defaultServerSettings = settings
         self.botSettings = botSettings
         self.servers = dict()
@@ -17,27 +16,19 @@ class DiscordBot:
         if not settings:
             settings = self.defaultServerSettings
         self.servers[server.id] = DiscordServer(server, settings, messages)
-        return
-
+        
 
 class DiscordServer:
     def __init__(self, server, settings, messages=0):
         self.markov = Markov(initEmpty=True)
-        self.markov.line_size = messages
-        # Holds individual settings for each server
-        self.settings = settings
-        self.reactions = dict()
         self.server = server
 
         # Check to see if we have serialized data stored for this server
-        if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
-            with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
-                # Load the data into the servers variable
-                self.settings = pickle.load(f)
-        if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
-            with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
-                # Load the data into the reactions variable
-                self.reactions = pickle.load(f)
+        # `settings` and `reactions` hold individual settings for each server
+        if not self.tryLoadSettingsState():
+            self.settings = settings
+        if not self.tryLoadReactionsState():
+            self.reactions = dict()
 
         # If the log exists, we can check to see how many lines it has
         if os.path.isfile("logs/{}_chat_log".format(server.id)):
@@ -52,7 +43,7 @@ class DiscordServer:
                     lengthRestriction = None
                     if 'markovDigestLength' in self.settings['markov']:
                         lengthRestriction = self.settings['markov']['markovDigestLength']
-                    elif 'markovSentenceLength' in settings:
+                    elif 'markovSentenceLength' in settings['markov']:
                         lengthRestriction = self.settings['markov']['markovSentenceLength']
                     self.markov = Markov(f, self.settings['markov']['maxMarkovBytes'], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
@@ -66,6 +57,22 @@ class DiscordServer:
         with open("data/{}_reactions.pickle".format(self.server.id), "wb") as f:
             pickle.dump(self.reactions, f)
         return
+
+    def tryLoadSettingsState(self):
+        if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
+            with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
+                # Load the data into the servers variable
+                self.settings = pickle.load(f)
+            return True
+        return False
+
+    def tryLoadReactionsState(self):
+        if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
+            with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
+                # Load the data into the reactions variable
+                self.reactions = pickle.load(f)
+            return True
+        return False
 
 
 class TimeDenum(Enum):

@@ -13,6 +13,7 @@ class UtilityCommands:
 
     @commands.command(pass_context=True)
     async def timer(self, ctx, time=None, name=None):
+        serverId = ctx.message.server.id
         """Sets a timer. Usage: timer XhYmZs [NAME]"""
         def timerUsage():
             return ("Usage: `timer XhYmZs [NAME]`\n"+
@@ -74,7 +75,8 @@ class UtilityCommands:
         if not name:
             # Requires Python 3.6+
             name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        if 'maxTimerSeconds' in self.bot.settings and timeNum > self.bot.settings['maxTimerSeconds']:
+        if ('maxTimerSeconds' in self.bot.servers[serverId].settings and
+                timeNum > self.bot.servers[serverId].settings['maxTimerSeconds']):
             await self.client.say("The time requested is too much. Please use a smaller number.")
             return
         await self.client.say("Timer called `{}` started. It will expire in {}.".format(name, expireTime))

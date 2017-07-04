@@ -1,15 +1,18 @@
-import modules.messageResponder
+from modules.messageResponder import reactToMessage
 from modules.utilities import logMessage
 
 # This function should contain only message responses to what users say
 # It should not contain actual commands or utilities.
 async def handle(msg, bot, client):
     # Log the message for the markov bot
-    if 'markovEnable' in bot.settings['markov'] and bot.settings['markov']['markovEnable']:
+    serverId = msg.server.id
+    if ('markovEnable' in bot.servers[serverId].settings['markov'] and 
+            bot.servers[serverId].settings['markov']['markovEnable']):
         logMessage(msg, bot)
 
-    if 'reactionsEnable' in bot.settings and bot.settings['reactionsEnable']:
-        await reactToMessages(msg, bot, client)
+    if ('reactionsEnable' in bot.servers[serverId].settings and 
+            bot.servers[serverId].settings['reactionsEnable']):
+        await reactToMessage(msg, bot, client)
     return
 
 

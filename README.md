@@ -28,3 +28,4 @@ Configure a config.yaml based on the example.
 8. Spam prevention
   * Place user into timeout group that doesn't allow messages to be sent (option) if they spam
   * Message moderators/admins
+9. Allow different chain lengths for markov (low priority, high memory usage potential)
