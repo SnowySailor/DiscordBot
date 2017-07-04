@@ -5,8 +5,9 @@ from markovgen import Markov
 
 
 class DiscordBot:
-    def __init__(self, settings, botSettings):
+    def __init__(self, settings, botSettings, reactions=None):
         self.defaultServerSettings = settings
+        self.defaultServerReactions = reactions
         self.botSettings = botSettings
         self.servers = dict()
 
@@ -16,7 +17,7 @@ class DiscordBot:
         if not settings:
             settings = self.defaultServerSettings
         self.servers[server.id] = DiscordServer(server, settings, messages)
-        
+
 
 class DiscordServer:
     def __init__(self, server, settings, messages=0):

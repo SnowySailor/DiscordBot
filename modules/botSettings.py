@@ -1,4 +1,5 @@
 from discord.ext import commands
+import re
 #from modules.utilities import requireServer
 
 
@@ -143,45 +144,95 @@ class SettingsCommands:
             await client.say("That is already a reaction. You can change it if you want!")
             return
         else:
+            try:
+                re.compile(regex)
+            except re.error:
+                await self.client.say("That regex doesn't appear to be valid.")
+                return
+            try:
+                probability = int(probability)
+            except ValueError:
+                await self.client.say("Your probability must be an integer.")
+                return
             self.bot.servers[server.id].reactions[name] = (regex, reply, probability)
-            await self.client.say("Reaction `{}` added.")
+            self.bot.servers[server.id].saveReactionsState()
+            await self.client.say("Reaction `{}` added.".format(name))
             return
 
     @reactions.group(pass_context=True, no_pm=True, aliases=['change'])
     async def rchange(self, ctx):
+        server = ctx.message.server
         if ctx.invoked_subcommand is None:
             raise commands.BadArgument
             return
+        self.bot.servers[server.id].saveReactionsState()
+
+    @rchange.command(pass_context=True, no_pm=True)
+    async def reaction(self, ctx, name, newVal):
+        server = ctx.message.server
+        if name in self.bot.servers[sever.id].reactions:
+            oldTuple = self.bot.servers[server.id].reactions[name]
+            newTuple = (newVal, oldTuple[1], oldTuple[2])
+            self.bot.servers[server.id].reactions[name] = newTuple
+            self.bot.servers[server.id].saveReactionsState()
+            await self.client.say("Updated reaction `{}`.".format(name))
+        else:
+            await self.client.say("This isn't a reaction. You can add it though.")
+        return
 
     @rchange.command(pass_context=True, no_pm=True)
     async def regex(self, ctx, name, newVal):
-        await self.client.say("Accessed")
+        server = ctx.message.server
+        if name in self.bot.servers[server.id].reactions:
+            try:
+                re.compile(newVal)
+            except re.error:
+                await self.client.say("That regex doesn't appear to be valid.")
+                return
+            oldTuple = self.bot.servers[server.id].reactions[name]
+            newTuple = (oldTuple[0], newVal, oldTuple[2])
+            self.bot.servers[server.id].reactions[name] = newTuple
+            self.bot.servers[server.id].saveReactionsState()
+            await self.client.say("Updated reaction `{}`.".format(name))
+        else:
+            await self.client.say("This isn't a reaction. You can add it though.")
         return
-    #     elif mode.lower() == "change":
-    #         if not reaction or not regex or not reply:
-    #             await self.client.say("Improper parameters.\n{}"
-    #                             .format(self.reactionsUsage()))
-    #             return
-    #         if regex.lower() == "regex":
-    #             return
-    #         elif regex.lower() == "reply":
-    #             return
-    #         elif regex.lower() == "probability":
-    #             return
-    #         else:
-    #             await self.client.say("Unrecognized key.\n{}"
-    #                             .format(self.reactionsUsage()))
-    #             return
-    #         return
-    #     elif mode.lower() == "remove":
-    #         if not reaction:
-    #             await self.client.say("Improper parameters.\n{}"
-    #                             .format(self.reactionsUsage()))
-    #             return
-    #         # TODO: Creat a way to store reactions in the server object
-    #         return
-    #     else:
-    #         await self.client.say("Unrecognized modification mode.\n{}"
-    #                         .format(self.reactionsUsage()))
-    #         return
-    #     return
+
+    @rchange.command(pass_context=True, no_pm=True)
+    async def probability(self, ctx, name, newVal):
+        server = ctx.message.server
+        if name in self.bot.servers[server.id].reactions:
+            try:
+                newVal = int(newVal)
+            except ValueError:
+                await self.client.say("Your probability must be an integer.")
+                return
+            oldTuple = self.bot.servers[server.id].reactions[name]
+            newTuple = (oldTuple[0], oldTuple[1], newVal)
+            self.bot.servers[server.id].reactions[name] = newTuple
+            self.bot.servers[server.id].saveReactionsState()
+            await self.client.say("Updated reaction `{}`.".format(name))
+        else:
+            await self.client.say("This isn't a reaction. You can add it though.")
+        return
+
+    @reactions.command(pass_context=True, no_pm=True, aliases=['remove'])
+    async def rremove(self, ctx, name):
+        server = ctx.message.server
+        if name not in self.bot.servers[server.id].reactions:
+            await self.client.say("That isn't a reaction. You can list them with `reactions list`")
+            return
+        else:
+            oldVal = self.bot.servers[server.id].reactions[name]
+            del self.bot.servers[server.id].reactions[name]
+            self.bot.servers[server.id].saveReactionsState()
+            await self.client.say("Reaction {} with value {} removed."
+                                  .format(name, oldVal))
+            return
+
+    @reactions.command(pass_context=True, no_pm=True, aliases=['reset'])
+    async def rreset(self, ctx, name):
+        server = ctx.message.server
+        self.bot.servers[server.id].reactions = self.bot.defaultServerReactions
+        self.bot.servers[server.id].saveReactionsState()
+        await self.client.say("All reactions reset to default.")
