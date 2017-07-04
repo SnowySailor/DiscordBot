@@ -165,7 +165,6 @@ class SettingsCommands:
         if ctx.invoked_subcommand is None:
             raise commands.BadArgument
             return
-        self.bot.servers[server.id].saveReactionsState()
 
     @rchange.command(pass_context=True, no_pm=True)
     async def reaction(self, ctx, name, newVal):
@@ -236,3 +235,32 @@ class SettingsCommands:
         self.bot.servers[server.id].reactions = self.bot.defaultServerReactions
         self.bot.servers[server.id].saveReactionsState()
         await self.client.say("All reactions reset to default.")
+
+
+    @reactions.error
+    @radd.error
+    @rchange.error
+    @rremove.error
+    @rreset.error
+    @rlist.error
+    @reaction.error
+    @regex.error
+    @probability.error
+    async def settingsError(self, error, ctx):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.client.say("You're missing some arguments.\n{}".format(self.reactionsUsage()))
+            return
+        elif isinstance(error, commands.NoPrivateMessage):
+            await self.client.say("You can't call this from direct messages!")
+            return
+        elif isinstance(error, commands.CheckFailure):
+            await self.client.say("Sorry, you don't have the Manage Server permission.")
+            return
+        elif isinstance(error, commands.TooManyArguments):
+            await self.client.say("There's too many arguments. Please make sure you called the command correctly.\n{}"
+                                  .format(self.reactionsUsage()))
+            return
+        elif isinstance(error, commands.BadArgument):
+            await self.client.say("There seems to be a bad argument.\n{}"
+                                  .format(self.reactionsUsage()))
+            return

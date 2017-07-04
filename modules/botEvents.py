@@ -19,7 +19,6 @@ class BotEvents:
             # Use direct reference to "None" to avoid confusion
             if msg.server is None:
                 await handlePersonalMessage(msg, bot, client)
-                return
 
             await client.process_commands(msg)
 
