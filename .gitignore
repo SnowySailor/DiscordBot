@@ -1,4 +1,5 @@
 config.yaml
+reactions.yaml
 __pycache__
 logs/*
 data/*

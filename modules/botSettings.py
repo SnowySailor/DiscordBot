@@ -230,7 +230,7 @@ class SettingsCommands:
             return
 
     @reactions.command(pass_context=True, no_pm=True, aliases=['reset'])
-    async def rreset(self, ctx, name):
+    async def rreset(self, ctx):
         server = ctx.message.server
         self.bot.servers[server.id].reactions = self.bot.defaultServerReactions
         self.bot.servers[server.id].saveReactionsState()

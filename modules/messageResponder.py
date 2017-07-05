@@ -5,6 +5,24 @@ import os
 
 # Handles message reactions
 async def reactToMessage(msg, bot, client):
+
+    for _, values in bot.servers[msg.server.id].reactions.items():
+        reg = values[0]
+        print(values)
+        try:
+            re.compile(reg)
+        except re.error:
+            await client.send_message(msg.channel, "Something is wrong with this regex: `{}`".format(reg))
+            continue
+        if re.match(reg, msg.content, re.IGNORECASE):
+            if values[2] == 0:
+                s = 0
+            else:
+                s = random.randint(1,values[2])
+            if(s == 0):
+                await client.send_message(msg.channel, values[1])
+                return
+
     if re.match(".*", msg.content, re.IGNORECASE):
         s = random.randint(0, 20000)
         if(s == 42):

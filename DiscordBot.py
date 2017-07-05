@@ -14,11 +14,12 @@ from modules.parseSettings import getSettings
 # Perhaps there is a better way to manage this sort of thing
 # TODO: Remove the defaultSettings from going into the bot,
 #       make new attr that is 'token' only.
-parsedSettings = getSettings()
+parsedSettings = getSettings('config.yaml')
+parsedReactions = getSettings('reactions.yaml')
 botSettings = parsedSettings['bot']
 defaultServerSettings = parsedSettings['serverSettings']
 
-bot = DiscordBot(defaultServerSettings, botSettings)
+bot = DiscordBot(defaultServerSettings, botSettings, parsedReactions)
 client = commands.Bot(command_prefix=commands
                       .when_mentioned_or(bot.botSettings['prefix']), 
                       description="I am your best friend")

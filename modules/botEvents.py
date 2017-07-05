@@ -13,7 +13,7 @@ class BotEvents:
             # Check to see if the server is registered in the bot
             if msg.server and msg.server.id not in bot.servers:
                 # Add a new server to the server dict.
-                bot.addServer(msg.server, bot.defaultServerSettings)
+                bot.addServer(msg.server, bot.defaultServerSettings, bot.defaultServerReactions)
 
             # Server is None if the msg is a PM.
             # Use direct reference to "None" to avoid confusion

@@ -1,13 +1,13 @@
 import yaml  # PyYAML library: http://pyyaml.org
 
 
-def readSettings():
-    file = open('config.yaml', encoding='utf-8')
+def readSettings(name):
+    file = open(name, encoding='utf-8')
     content = file.read()
     return content
 
 
-def getSettings():
-    data = readSettings()
+def getSettings(name):
+    data = readSettings(name)
     contents = yaml.load(data)
     return contents
