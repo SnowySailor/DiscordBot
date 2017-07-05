@@ -3,11 +3,11 @@ from discord.ext import commands
 import sys
 from classes import DiscordBot
 
-from modules.botAudio import Music
-from modules.botSettings import SettingsCommands
-from modules.botUtilities import UtilityCommands
-from modules.botMisc import MiscCommands
-from modules.botEvents import BotEvents
+from cogs.botAudio import Music
+from cogs.botSettings import SettingsCommands
+from cogs.botUtilities import UtilityCommands
+from cogs.botMisc import MiscCommands
+from cogs.botEvents import BotEvents
 
 from modules.parseSettings import getSettings
 
