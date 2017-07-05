@@ -1,7 +1,7 @@
 import re
 import random
 import os
-
+from classes import AccessData
 
 # Handles message reactions
 async def reactToMessage(msg, bot, client):
@@ -20,7 +20,8 @@ async def reactToMessage(msg, bot, client):
             else:
                 s = random.randint(1,values[2])
             if(s == 0):
-                await client.send_message(msg.channel, values[1])
+                data = AccessData(msg.author, client.user)
+                await client.send_message(msg.channel, values[1].format(data))
                 return
 
     if re.match(".*", msg.content, re.IGNORECASE):

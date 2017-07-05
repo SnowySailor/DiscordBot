@@ -80,3 +80,8 @@ class TimeDenum(Enum):
     S = 1
     M = 2
     H = 3
+
+class AccessData:
+    def __init__(self, author, clientUser):
+        self.author = author
+        self.clientUser = clientUser
