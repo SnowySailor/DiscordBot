@@ -14,10 +14,10 @@ async def reactToMessage(msg, bot, client):
             continue
         if re.match(reg, msg.content, re.IGNORECASE):
             if values[2] == 0:
-                s = 0
+                s = 1
             else:
                 s = random.randint(1,values[2])
-            if(s == 0):
+            if(s == 1):
                 data = AccessData(msg.author, client.user)
                 await client.send_message(msg.channel, values[1].format(data))
                 return

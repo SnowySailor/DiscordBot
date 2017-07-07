@@ -158,7 +158,7 @@ class SettingsCommands:
     #@requireServer
     async def reactions(self, ctx):
         if ctx.invoked_subcommand is None:
-            await self.client.say("Unrecognized modification mode.\n{}"
+            await self.client.say("Unrecognized mode.\n{}"
                                   .format(self.reactionsUsage()))
 
     @reactions.command(name="list", pass_context=True, no_pm=True)
@@ -180,6 +180,10 @@ class SettingsCommands:
             except re.error:
                 await self.client.say("That regex doesn't appear to be valid.")
                 return
+            for _,(r,_,_) in self.bot.servers[server.id].reactions.items():
+                if regex == r:
+                    await self.client.say("That regex already exists.")
+                    return
             try:
                 probability = int(probability)
             except ValueError:
@@ -200,8 +204,8 @@ class SettingsCommands:
     async def reaction(self, ctx, name, newVal):
         server = ctx.message.server
         if name in self.bot.servers[server.id].reactions:
-            oldTuple = self.bot.servers[server.id].reactions[name]
-            newTuple = (newVal, oldTuple[1], oldTuple[2])
+            (reg,_,prob) = self.bot.servers[server.id].reactions[name]
+            newTuple = (reg, newVal, prob)
             self.bot.servers[server.id].reactions[name] = newTuple
             self.bot.servers[server.id].saveReactionsState()
             await self.client.say("Updated reaction `{}`.".format(name))
@@ -218,8 +222,8 @@ class SettingsCommands:
             except re.error:
                 await self.client.say("That regex doesn't appear to be valid.")
                 return
-            oldTuple = self.bot.servers[server.id].reactions[name]
-            newTuple = (oldTuple[0], newVal, oldTuple[2])
+            (_,react,prob) = self.bot.servers[server.id].reactions[name]
+            newTuple = (newVal, react, prob)
             self.bot.servers[server.id].reactions[name] = newTuple
             self.bot.servers[server.id].saveReactionsState()
             await self.client.say("Updated reaction `{}`.".format(name))
@@ -236,8 +240,8 @@ class SettingsCommands:
             except ValueError:
                 await self.client.say("Your probability must be an integer.")
                 return
-            oldTuple = self.bot.servers[server.id].reactions[name]
-            newTuple = (oldTuple[0], oldTuple[1], newVal)
+            (reg,react,_) = self.bot.servers[server.id].reactions[name]
+            newTuple = (reg, react, newVal)
             self.bot.servers[server.id].reactions[name] = newTuple
             self.bot.servers[server.id].saveReactionsState()
             await self.client.say("Updated reaction `{}`.".format(name))
@@ -278,7 +282,8 @@ class SettingsCommands:
     @probability.error
     async def reactionsError(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument):
-            await self.client.say("You're missing some arguments.\n{}".format(self.reactionsUsage()))
+            await self.client.say("You're missing some arguments.\n{}"
+                                  .format(self.reactionsUsage()))
             return
         elif isinstance(error, commands.CheckFailure):
             await self.client.say("Sorry, you don't have the Manage Server permission.")
