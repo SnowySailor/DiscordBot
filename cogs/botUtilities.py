@@ -11,7 +11,7 @@ class UtilityCommands:
         self.client = client
         self.bot = bot
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def timer(self, ctx, time=None, name=None):
         serverId = ctx.message.server.id
         """Sets a timer. Usage: timer XhYmZs [NAME]"""

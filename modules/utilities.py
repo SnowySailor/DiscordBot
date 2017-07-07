@@ -93,6 +93,7 @@ def listSettings(settings, prefix=""):
             strDump += "{}{}: {}\n".format(prefix, k, v[0])
     return strDump
 
+# On failure throws BadArgument
 def verifySetting(strVal, settings):
     if "." not in strVal:
         if strVal not in settings:
@@ -115,17 +116,31 @@ def verifySetting(strVal, settings):
 def verifyReaction(strVal, reactions):
     return
 
+# On failure throws KeyError
 def setValue(storage, tree, value):
     if len(tree) == 1:
         storage[tree[0]] = value
     else:
         setValue(storage[tree[0]], tree[1:], value)
 
+# If a key doesn't exist, returns None
 def getValue(storage, tree):
     if len(tree) == 1:
+        if tree[0] not in storage:
+            return None
         return storage[tree[0]]
     else:
+        if tree[0] not in storage:
+            return None
         return getValue(storage[tree[0]], tree[1:])
+
+# On failure throws KeyError
+def deleteEntry(storage, tree):
+    if len(tree) == 1:
+        del storage[tree[0]]
+    else:
+        deleteEntry(storage[tree[0]], tree[1:])
+
 
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():

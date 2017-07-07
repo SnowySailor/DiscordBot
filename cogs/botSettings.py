@@ -1,6 +1,7 @@
 from discord.ext import commands
-from modules.utilities import parse, listSettings, setValue, getValue, verifySetting
+from modules.utilities import parse, listSettings, setValue, getValue, deleteEntry, verifySetting
 import re
+import copy
 #from modules.utilities import requireServer
 
 
@@ -37,31 +38,33 @@ class SettingsCommands:
     @settings.command(pass_context=True, no_pm=True)
     async def add(self, ctx, setting, val):
         server = ctx.message.server
-        if setting in self.bot.servers[server.id].settings:
-            # Setting is already in use
-            await self.client.say("""That is already a setting. You can modify it or remove it:""")
+        # Check to see if the setting is a valid setting from the config
+        try:
+            settingTree = verifySetting(setting, self.bot.defaultServerSettings)
+        except commands.BadArgument:
+            await self.client.say("That isn't a valid setting.")
             return
-        else:
-            # This is a new setting
-            try:
-                settingTree = verifySetting(setting, self.bot.defaultServerSettings)
-            except commands.BadArgument:
-                await self.client.say("That isn't a valid setting.")
-                return
-            defaultValue = getValue(self.bot.defaultServerSettings, settingTree)
-            t = defaultValue[1]
-            try:
-                parsedValue = parse(val, t)
-            except ValueError:
-                await self.client.say("Error parsing: {}\nType should be `{}`."
-                                      .format(val, t))
-                return
-            newVal = (parsedValue, t)
-            self.bot.servers[server.id].settings[setting] = newVal
-            self.bot.servers[server.id].saveSettingsState()
-            await self.client.say("Setting `{}` added with value `{}`"
-                            .format(setting, val))
+        # Check to see if the value exists in the current settings
+        if getValue(self.bot.servers[server.id].settings, settingTree):
+            await self.client.say("This setting is already in existance.")
             return
+        print(getValue(self.bot.servers[server.id].settings, settingTree))
+
+        # Get the type from the default settings
+        (_,t) = getValue(self.bot.defaultServerSettings, settingTree)
+        # Attempt to parse the setting based on the given type.
+        try:
+            parsedValue = parse(val, t)
+        except ValueError:
+            await self.client.say("Error parsing: {}\nType should be `{}`."
+                                  .format(val, t))
+            return
+        newVal = (parsedValue, t)
+        setValue(self.bot.servers[server.id].settings, settingTree, newVal)
+        self.bot.servers[server.id].saveSettingsState()
+        await self.client.say("Setting `{}` added with value `{}`"
+                        .format(setting, val))
+        return
 
     @settings.command(pass_context=True, no_pm=True)
     async def list(self, ctx):
@@ -74,52 +77,56 @@ class SettingsCommands:
     @settings.command(pass_context=True, no_pm=True)
     async def change(self, ctx, setting, newVal):
         server = ctx.message.server
-
+        # Check to make sure the setting is already a valid setting
         try:
             settingTree = verifySetting(setting, self.bot.servers[server.id].settings)
         except commands.BadArgument:
             await self.client.say("This is not a valid setting. You can list the valid settings with `settings list`")
 
-        oldVal = getValue(self.bot.servers[server.id].settings, settingTree)
-        t = oldVal[1]
+        # Get the previous value so that we can list it
+        (oldVal, t) = getValue(self.bot.servers[server.id].settings, settingTree)
+        # Attempt to parse the new value
         try:
             parsedVal = parse(newVal, t)
         except ValueError:
             await self.client.say("Error parsing: {}\nType should be `{}`."
                             .format(newVal, t))
             return
-
-        if oldVal[0] == parsedVal:
+        # Check to see if the old value is the same as the new value.
+        # If it is, we don't need to do anything.
+        if oldVal == parsedVal:
             await self.client.say("`{}` is already the current setting for `{}`"
-                            .format(oldVal[0], setting))
+                            .format(oldVal, setting))
             return
-
+        # Set the new value
         newVal = (parsedVal, t)
         setValue(self.bot.servers[server.id].settings, settingTree, newVal)
         self.bot.servers[server.id].saveSettingsState()
         await self.client.say("Setting `{}` changed from `{}` to `{}`."
-                              .format(setting, oldVal[0], newVal[0]))
+                              .format(setting, oldVal, parsedVal))
         return
 
     @settings.command(pass_context=True, no_pm=True)
     async def remove(self, ctx, setting):
-        server = ctx.message.server
-        if setting not in self.bot.servers[server.id].settings:
+        server = ctx.message.server            
+        try:
+            settingsTree = verifySetting(setting, self.bot.servers[server.id].settings)
+        except commands.BadArgument:
             # Can't delete a setting we don't have
-            await self.client.say("""This is not a valid setting. You can list the valid settings with `settings list`""")
+            await self.client.say("This is not a setting. You can list the valid settings with `settings list`")
             return
-        else:
-            # Delete the setting
-            oldVal = self.bot.servers[server.id].settings[setting][0]
-            del self.bot.servers[server.id].settings[setting]
-            self.bot.servers[server.id].saveSettingsState()
-            await self.client.say("Setting `{}` removed.".format(setting))
-            return
+
+        # Delete the setting
+        deleteEntry(self.bot.servers[server.id].settings, settingsTree)
+        self.bot.servers[server.id].saveSettingsState()
+        await self.client.say("Setting `{}` removed.".format(setting))
+        return
 
     @settings.command(pass_context=True, no_pm=True)
     async def reset(self, ctx):
         server = ctx.message.server
-        self.bot.servers[server.id].settings = self.bot.defaultServerSettings
+        # We need to deep copy or else updating the server settings will rewrite the defaults
+        self.bot.servers[server.id].settings = copy.deepcopy(self.bot.defaultServerSettings)
         self.bot.servers[server.id].saveSettingsState()
         await self.client.say("All settings reset to default.")
 
@@ -157,14 +164,14 @@ class SettingsCommands:
             await self.client.say("Unrecognized modification mode.\n{}"
                                   .format(self.reactionsUsage()))
 
-    @reactions.command(pass_context=True, no_pm=True, aliases=['list'])
+    @reactions.command(name="list", pass_context=True, no_pm=True)
     async def rlist(self, ctx):
         server = ctx.message.server
         settingList = "\n".join(["`{}: {}`".format(x, y) for (x,y) in
                                  self.bot.servers[server.id].reactions.items()])
         await self.client.say("Here's a list of reactions:\n{}".format(settingList))
 
-    @reactions.command(pass_context=True, no_pm=True, aliases=['add'])
+    @reactions.command(name="add", pass_context=True, no_pm=True)
     async def radd(self, ctx, name, regex, reply, probability):
         server = ctx.message.server
         if name in self.bot.servers[server.id].reactions:
@@ -186,7 +193,7 @@ class SettingsCommands:
             await self.client.say("Reaction `{}` added.".format(name))
             return
 
-    @reactions.group(pass_context=True, no_pm=True, aliases=['change'])
+    @reactions.group(name="change", pass_context=True, no_pm=True)
     async def rchange(self, ctx):
         if ctx.invoked_subcommand is None:
             raise commands.BadArgument
@@ -241,7 +248,7 @@ class SettingsCommands:
             await self.client.say("This isn't a reaction. You can add it though.")
         return
 
-    @reactions.command(pass_context=True, no_pm=True, aliases=['remove'])
+    @reactions.command(name="remove", pass_context=True, no_pm=True)
     async def rremove(self, ctx, name):
         server = ctx.message.server
         if name not in self.bot.servers[server.id].reactions:
@@ -255,10 +262,10 @@ class SettingsCommands:
                                   .format(name, oldVal))
             return
 
-    @reactions.command(pass_context=True, no_pm=True, aliases=['reset'])
+    @reactions.command(name="reset", pass_context=True, no_pm=True)
     async def rreset(self, ctx):
         server = ctx.message.server
-        self.bot.servers[server.id].reactions = self.bot.defaultServerReactions
+        self.bot.servers[server.id].reactions = copy.deepcopy(self.bot.defaultServerReactions)
         self.bot.servers[server.id].saveReactionsState()
         await self.client.say("All reactions reset to default.")
 
