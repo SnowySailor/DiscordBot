@@ -5,10 +5,8 @@ from classes import AccessData
 
 # Handles message reactions
 async def reactToMessage(msg, bot, client):
-
     for _, values in bot.servers[msg.server.id].reactions.items():
         reg = values[0]
-        print(values)
         try:
             re.compile(reg)
         except re.error:
@@ -49,9 +47,6 @@ async def reactToMessage(msg, bot, client):
     if ('markovEnable' in bot.servers[msg.server.id].settings['markov'] 
             and bot.servers[msg.server.id].settings['markov']['markovEnable'][0] 
             and re.match("^bot be random", msg.content, re.IGNORECASE)):
-        # if msg.server.id not in bot.servers:
-        #     await client.send_message(msg.channel, "Loading data.")
-        #     bot.addServer(msg.server, bot.defaultServerSettings)
         if (bot.servers[msg.server.id].markov.line_size < 
                 bot.servers[msg.server.id].settings['markov']['minMarkov'][0]):
             await client.send_message(msg.channel, "Not enough data.")

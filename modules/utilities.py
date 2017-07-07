@@ -1,5 +1,6 @@
 import re
 from discord.ext import commands
+from ast import literal_eval as make_tuple
 
 def cleanMessage(msg, bot):
     serverId = msg.server.id
@@ -59,8 +60,72 @@ def logMessage(msg, bot):
         print("Logged:", line)
     return
 
-def parseSetting(value, type):
+def parse(strVal, expectedType):
+    retVal = None
+    if expectedType is int:
+        try:
+            retVal = int(strVal)
+            print(retVal)
+        except ValueError:
+            raise ValueError
+    elif expectedType is str:
+        retVal = strVal
+    elif expectedType is tuple:
+        try:
+            retVal = make_tuple(strVal)
+        except ValueError:
+            raise ValueError
+    elif expectedType is bool:
+        if strVal.lower() == "true":
+            retVal = True
+        elif strVal.lower() == "false":
+            retVal = False
+        else:
+            raise ValueError
+    return retVal
+
+def listSettings(settings, prefix=""):
+    strDump = ""
+    for k, v in settings.items():
+        if type(v) is dict:
+            strDump += listSettings(v, "{}.".format(k))
+        else:
+            strDump += "{}{}: {}\n".format(prefix, k, v[0])
+    return strDump
+
+def verifySetting(strVal, settings):
+    if "." not in strVal:
+        if strVal not in settings:
+            raise commands.BadArgument
+        else:
+            return [strVal]
+    else:
+        current = settings
+        chain = []
+
+        for s in strVal.split("."):
+            if s not in current:
+                raise commands.BadArgument
+            else:
+                chain.append(s)
+                current = current[s]
+        return chain
+    raise commands.BadArgument
+
+def verifyReaction(strVal, reactions):
     return
+
+def setValue(storage, tree, value):
+    if len(tree) == 1:
+        storage[tree[0]] = value
+    else:
+        setValue(storage[tree[0]], tree[1:], value)
+
+def getValue(storage, tree):
+    if len(tree) == 1:
+        return storage[tree[0]]
+    else:
+        return getValue(storage[tree[0]], tree[1:])
 
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():

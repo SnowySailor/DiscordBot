@@ -1,5 +1,5 @@
 from discord.ext import commands
-from modules.parseSettings import parse
+from modules.utilities import parse, listSettings, setValue, getValue, verifySetting
 import re
 #from modules.utilities import requireServer
 
@@ -52,36 +52,40 @@ class SettingsCommands:
     @settings.command(pass_context=True, no_pm=True)
     async def list(self, ctx):
         server = ctx.message.server
-        # TODO: Need to come up with a good way to display in table
-        settingList = "\n".join(["`{}: {}`".format(x, y) for (x,y) in
-                                 self.bot.servers[server.id].settings.items()])
+        # Embed message perhaps
         await self.client.say("Here is a list of settings:\n{}"
-                              .format(settingList))
+                              .format(listSettings(self.bot.servers[server.id].settings)))
         return
 
     @settings.command(pass_context=True, no_pm=True)
     async def change(self, ctx, setting, newVal):
         server = ctx.message.server
-        if setting not in self.bot.servers[server.id].settings:
-            # This is not a setting yet
-            await self.client.say("""This is not a valid setting. You can list the valid settings with `settings list`""")
+
+        try:
+            settingTree = verifySetting(setting, self.bot.servers[server.id].settings)
+        except commands.BadArgument:
+            await self.client.say("This is not a valid setting. You can list the valid settings with `settings list`")
+
+        oldVal = getValue(self.bot.servers[server.id].settings, settingTree)
+        t = oldVal[1]
+        try:
+            parsedVal = parse(newVal, t)
+        except ValueError:
+            await self.client.say("Error parsing: {}\nType should be `{}`."
+                            .format(newVal, t))
             return
-        else:
-            # This is a setting we can change
-            oldVal = self.bot.servers[server.id].settings[setting]
-            t = self.bot.servers[server.id].settings[setting][1]
-            try:
-                parsedVal = parse(newVal, t)
-            except ValueError:
-                await self.client.say("Error parsing: {}\nType should be `{}`."
-                                .format(newVal, t))
-                return
-            newVal = (parsedVal, t)
-            self.bot.servers[server.id].settings[setting] = newVal
-            self.bot.servers[server.id].saveSettingsState()
-            await self.client.say("Setting `{}` changed from `{}` to `{}`."
-                            .format(setting, oldVal[0], newVal[0]))
+
+        if oldVal[0] == parsedVal:
+            await self.client.say("`{}` is already the current setting for `{}`"
+                            .format(oldVal[0], setting))
             return
+
+        newVal = (parsedVal, t)
+        setValue(self.bot.servers[server.id].settings, settingTree, newVal)
+        self.bot.servers[server.id].saveSettingsState()
+        await self.client.say("Setting `{}` changed from `{}` to `{}`."
+                              .format(setting, oldVal[0], newVal[0]))
+        return
 
     @settings.command(pass_context=True, no_pm=True)
     async def remove(self, ctx, setting):
@@ -170,7 +174,6 @@ class SettingsCommands:
 
     @reactions.group(pass_context=True, no_pm=True, aliases=['change'])
     async def rchange(self, ctx):
-        server = ctx.message.server
         if ctx.invoked_subcommand is None:
             raise commands.BadArgument
             return
@@ -178,7 +181,7 @@ class SettingsCommands:
     @rchange.command(pass_context=True, no_pm=True)
     async def reaction(self, ctx, name, newVal):
         server = ctx.message.server
-        if name in self.bot.servers[sever.id].reactions:
+        if name in self.bot.servers[server.id].reactions:
             oldTuple = self.bot.servers[server.id].reactions[name]
             newTuple = (newVal, oldTuple[1], oldTuple[2])
             self.bot.servers[server.id].reactions[name] = newTuple
@@ -255,7 +258,7 @@ class SettingsCommands:
     @reaction.error
     @regex.error
     @probability.error
-    async def settingsError(self, error, ctx):
+    async def reactionsError(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument):
             await self.client.say("You're missing some arguments.\n{}".format(self.reactionsUsage()))
             return
