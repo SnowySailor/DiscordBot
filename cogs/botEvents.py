@@ -30,6 +30,7 @@ class BotEvents:
             # We don't return afterwards because it could also be a valid
             # message for handle()
 
+        # Make sure we don't handle a message that's a command
         if not msg.content.startswith(self.bot.botSettings['prefix']):
             await handle(msg, self.bot, self.client)
             return
