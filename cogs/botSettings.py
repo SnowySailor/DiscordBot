@@ -43,7 +43,21 @@ class SettingsCommands:
             return
         else:
             # This is a new setting
-            self.bot.servers[server.id].settings[setting][0] = val
+            try:
+                settingTree = verifySetting(setting, self.bot.defaultServerSettings)
+            except commands.BadArgument:
+                await self.client.say("That isn't a valid setting.")
+                return
+            defaultValue = getValue(self.bot.defaultServerSettings, settingTree)
+            t = defaultValue[1]
+            try:
+                parsedValue = parse(val, t)
+            except ValueError:
+                await self.client.say("Error parsing: {}\nType should be `{}`."
+                                      .format(val, t))
+                return
+            newVal = (parsedValue, t)
+            self.bot.servers[server.id].settings[setting] = newVal
             self.bot.servers[server.id].saveSettingsState()
             await self.client.say("Setting `{}` added with value `{}`"
                             .format(setting, val))
@@ -154,7 +168,7 @@ class SettingsCommands:
     async def radd(self, ctx, name, regex, reply, probability):
         server = ctx.message.server
         if name in self.bot.servers[server.id].reactions:
-            await client.say("That is already a reaction. You can change it if you want!")
+            await self.client.say("That is already a reaction. You can change it if you want!")
             return
         else:
             try:
