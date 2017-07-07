@@ -7,21 +7,21 @@ def cleanMessage(msg, bot):
     # we can just replace the newline with a space
     line = msg.content.replace("\n", " ")
     if ('removeNonAlphanumWords' in bot.servers[serverId].settings['markov']
-            and bot.servers[serverId].settings['markov']['removeNonAlphanumWords']):
+            and bot.servers[serverId].settings['markov']['removeNonAlphanumWords'][0]):
         # We don't want to log non-alphanumeric characters because something like
         # % or & or # isn't really a valuable word.
         line = re.sub("\s\W\s", " ", line)
     if ('removeHttpLinks' in bot.servers[serverId].settings['markov']
-            and bot.servers[serverId].settings['markov']['removeHttpLinks']):
+            and bot.servers[serverId].settings['markov']['removeHttpLinks'][0]):
         # If we don't want to log http links, we can remove them with regex
         line = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\s?", "", line)
     if ('removeHereEveryone' in bot.servers[serverId].settings['markov']
-            and bot.servers[serverId].settings['markov']['removeHereEveryone']):
+            and bot.servers[serverId].settings['markov']['removeHereEveryone'][0]):
         # If we don't want @here and @everyone recorded, we can remove them
         line = re.sub("\@(here|everyone)\s", "", line)
         line = re.sub("\s\@(here|everyone)", "", line)
     if ('removeUserMentions' in bot.servers[serverId].settings['markov']
-            and bot.servers[serverId].settings['markov']['removeUserMentions']):
+            and bot.servers[serverId].settings['markov']['removeUserMentions'][0]):
         # If we don't want @User#Num mentions, we can remove them
         # User mentions are <@69683046830462454> in text as an example
         line = re.sub("\s?<@[0-9]+>\s", " ", line)
@@ -35,7 +35,7 @@ def logMessage(msg, bot):
     # If the message is longer than the min sentence length we can process and log it
     lineLen = len(line.split())
     if (('markovSentenceLength' in bot.servers[serverId].settings['markov'] and
-            lineLen >= bot.servers[serverId].settings['markov']['markovSentenceLength']) or
+            lineLen >= bot.servers[serverId].settings['markov']['markovSentenceLength'][0]) or
             ('markovSentenceLength' not in bot.servers[serverId].settings['markov'] and lineLen >= 5)):
 
         serverId = msg.server.id
@@ -51,12 +51,15 @@ def logMessage(msg, bot):
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
             if (('markovDigestLength' in bot.servers[serverId].settings['markov'] and
-                    lineLen >= bot.servers[serverId].settings['markov']['markovDigestLength']) or
+                    lineLen >= bot.servers[serverId].settings['markov']['markovDigestLength'][0]) or
                     ('markovDigestLength' not in bot.servers[serverId].settings['markov'])):
                 bot.servers[serverId].markov.digest_single_message(line)
 
         print("New message count for", serverId, "is", bot.servers[serverId].markov.line_size)
         print("Logged:", line)
+    return
+
+def parseSetting(value, type):
     return
 
 # Use if the command requires the server to be in the DiscordBot

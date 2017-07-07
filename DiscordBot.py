@@ -9,7 +9,7 @@ from cogs.botUtilities import UtilityCommands
 from cogs.botMisc import MiscCommands
 from cogs.botEvents import BotEvents
 
-from modules.parseSettings import getSettings
+from modules.parseSettings import getSettings, parseServerSettings
 
 # Perhaps there is a better way to manage this sort of thing
 # TODO: Remove the defaultSettings from going into the bot,
@@ -17,7 +17,7 @@ from modules.parseSettings import getSettings
 parsedSettings = getSettings('config.yaml')
 parsedReactions = getSettings('reactions.yaml')
 botSettings = parsedSettings['bot']
-defaultServerSettings = parsedSettings['serverSettings']
+defaultServerSettings = parseServerSettings(parsedSettings['serverSettings'])
 
 bot = DiscordBot(defaultServerSettings, botSettings, parsedReactions)
 client = commands.Bot(command_prefix=commands

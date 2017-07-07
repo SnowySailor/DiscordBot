@@ -23,6 +23,6 @@ serverSettings:
     markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
     markovDigestLength: 15 # Only add messages longer than this length to the current markov object
     removeNonAlphanumWords: True # Do you want to treat single-character words like # or % as real words?
-    removeHttpLinks: True # Do you want to treat http links as real words?
+    removeHttpLinks: True # Do you want to remove http links from messages?
     removeHereEveryone: True # Remove @here and @everyone from messages the bot logs
     removeUserMentions: False # Remove @User#Num mentions from text so users don't get pinged during markov calls

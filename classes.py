@@ -11,16 +11,18 @@ class DiscordBot:
         self.botSettings = botSettings
         self.servers = dict()
 
-    def addServer(self, server, settings=None, messages=0):
+    def addServer(self, server, settings=None, reactions=None, messages=0):
         if server.id in self.servers:
             return
         if not settings:
             settings = self.defaultServerSettings
-        self.servers[server.id] = DiscordServer(server, settings, messages)
+        if not reactions:
+            reactions = self.defaultServerReactions
+        self.servers[server.id] = DiscordServer(server, settings, reactions, messages)
 
 
 class DiscordServer:
-    def __init__(self, server, settings, messages=0):
+    def __init__(self, server, settings, reactions, messages=0):
         self.markov = Markov(initEmpty=True)
         self.server = server
 
@@ -29,7 +31,7 @@ class DiscordServer:
         if not self.tryLoadSettingsState():
             self.settings = settings
         if not self.tryLoadReactionsState():
-            self.reactions = dict()
+            self.reactions = reactions
 
         # If the log exists, we can check to see how many lines it has
         if os.path.isfile("logs/{}_chat_log".format(server.id)):
@@ -43,10 +45,10 @@ class DiscordServer:
                 if i > 1:
                     lengthRestriction = None
                     if 'markovDigestLength' in self.settings['markov']:
-                        lengthRestriction = self.settings['markov']['markovDigestLength']
+                        lengthRestriction = self.settings['markov']['markovDigestLength'][0]
                     elif 'markovSentenceLength' in settings['markov']:
-                        lengthRestriction = self.settings['markov']['markovSentenceLength']
-                    self.markov = Markov(f, self.settings['markov']['maxMarkovBytes'], False, lengthRestriction)
+                        lengthRestriction = self.settings['markov']['markovSentenceLength'][0]
+                    self.markov = Markov(f, self.settings['markov']['maxMarkovBytes'][0], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
     def saveSettingsState(self):

@@ -1,4 +1,5 @@
 from discord.ext import commands
+from modules.parseSettings import parse
 import re
 #from modules.utilities import requireServer
 
@@ -42,7 +43,7 @@ class SettingsCommands:
             return
         else:
             # This is a new setting
-            self.bot.servers[server.id].settings[setting] = val
+            self.bot.servers[server.id].settings[setting][0] = val
             self.bot.servers[server.id].saveSettingsState()
             await self.client.say("Setting `{}` added with value `{}`"
                             .format(setting, val))
@@ -68,10 +69,18 @@ class SettingsCommands:
         else:
             # This is a setting we can change
             oldVal = self.bot.servers[server.id].settings[setting]
+            t = self.bot.servers[server.id].settings[setting][1]
+            try:
+                parsedVal = parse(newVal, t)
+            except ValueError:
+                await self.client.say("Error parsing: {}\nType should be `{}`."
+                                .format(newVal, t))
+                return
+            newVal = (parsedVal, t)
             self.bot.servers[server.id].settings[setting] = newVal
             self.bot.servers[server.id].saveSettingsState()
             await self.client.say("Setting `{}` changed from `{}` to `{}`."
-                            .format(setting, oldVal, newVal))
+                            .format(setting, oldVal[0], newVal[0]))
             return
 
     @settings.command(pass_context=True, no_pm=True)
@@ -83,7 +92,7 @@ class SettingsCommands:
             return
         else:
             # Delete the setting
-            oldVal = self.bot.servers[server.id].settings[setting]
+            oldVal = self.bot.servers[server.id].settings[setting][0]
             del self.bot.servers[server.id].settings[setting]
             self.bot.servers[server.id].saveSettingsState()
             await self.client.say("Setting `{}` removed.".format(setting))

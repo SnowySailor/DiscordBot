@@ -47,13 +47,13 @@ async def reactToMessage(msg, bot, client):
         return
 
     if ('markovEnable' in bot.servers[msg.server.id].settings['markov'] 
-            and bot.servers[msg.server.id].settings['markov']['markovEnable'] 
+            and bot.servers[msg.server.id].settings['markov']['markovEnable'][0] 
             and re.match("^bot be random", msg.content, re.IGNORECASE)):
         # if msg.server.id not in bot.servers:
         #     await client.send_message(msg.channel, "Loading data.")
         #     bot.addServer(msg.server, bot.defaultServerSettings)
         if (bot.servers[msg.server.id].markov.line_size < 
-                bot.servers[msg.server.id].settings['markov']['minMarkov']):
+                bot.servers[msg.server.id].settings['markov']['minMarkov'][0]):
             await client.send_message(msg.channel, "Not enough data.")
             return
         if bot.servers[msg.server.id].markov is not None:

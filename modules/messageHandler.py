@@ -7,11 +7,11 @@ async def handle(msg, bot, client):
     # Log the message for the markov bot
     serverId = msg.server.id
     if ('markovEnable' in bot.servers[serverId].settings['markov'] and 
-            bot.servers[serverId].settings['markov']['markovEnable']):
+            bot.servers[serverId].settings['markov']['markovEnable'][0]):
         logMessage(msg, bot)
 
     if ('reactionsEnable' in bot.servers[serverId].settings and 
-            bot.servers[serverId].settings['reactionsEnable']):
+            bot.servers[serverId].settings['reactionsEnable'][0]):
         await reactToMessage(msg, bot, client)
     return
 
