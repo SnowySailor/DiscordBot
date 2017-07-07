@@ -1,6 +1,6 @@
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
-from discord import Client
-import asyncio
+from discord.ext import commands
+
 
 class BotEvents:
     def __init__(self, client, bot):
@@ -39,3 +39,13 @@ class BotEvents:
         print(self.client.user.name)
         print(self.client.user.id)
         print('------')
+
+    async def on_command_error(self, error, ctx):
+        if isinstance(error, commands.errors.CommandNotFound):
+            await ctx.bot.send_message(ctx.message.channel, "Invalid command.")
+        elif isinstance(error, commands.errors.NoPrivateMessage):
+            await ctx.bot.send_message(ctx.message.channel,
+                            "You can't use this command in private messages.")
+        else:
+            print(type(error))
+        #elif isinstance(error, commands.errors.)

@@ -140,9 +140,6 @@ class SettingsCommands:
         if isinstance(error, commands.MissingRequiredArgument):
             await self.client.say("You're missing some arguments.\n{}".format(self.settingsUsage()))
             return
-        elif isinstance(error, commands.NoPrivateMessage):
-            await self.client.say("You can't call this from direct messages!")
-            return
         elif isinstance(error, commands.CheckFailure):
             await self.client.say("Sorry, you don't have the Manage Server permission.")
             return
@@ -282,9 +279,6 @@ class SettingsCommands:
     async def reactionsError(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument):
             await self.client.say("You're missing some arguments.\n{}".format(self.reactionsUsage()))
-            return
-        elif isinstance(error, commands.NoPrivateMessage):
-            await self.client.say("You can't call this from direct messages!")
             return
         elif isinstance(error, commands.CheckFailure):
             await self.client.say("Sorry, you don't have the Manage Server permission.")
