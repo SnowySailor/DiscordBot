@@ -2,24 +2,28 @@ import re
 import random
 import os
 from classes import AccessData
+from modules.utilities import safe_format
 
 # Handles message reactions
 async def reactToMessage(msg, bot, client):
-    for _, values in bot.servers[msg.server.id].reactions.items():
-        reg = values[0]
+    for _, (reg,reply,prob) in bot.servers[msg.server.id].reactions.items():
         try:
             re.compile(reg)
         except re.error:
             await client.send_message(msg.channel, "Something is wrong with this regex: `{}`".format(reg))
             continue
         if re.match(reg, msg.content, re.IGNORECASE):
-            if values[2] == 0:
+            if prob == 0:
                 s = 1
             else:
-                s = random.randint(1,values[2])
+                s = random.randint(1,prob)
             if(s == 1):
                 data = AccessData(msg.author, client.user)
-                await client.send_message(msg.channel, values[1].format(data))
+                try:
+                    await client.send_message(msg.channel, safe_format(reply, data))
+                except AttributeError:
+                    await client.send_message(msg.channel, "Something is fishy with this reply: `{}`"
+                        .format(reply))
                 return
 
     if re.match(".*", msg.content, re.IGNORECASE):

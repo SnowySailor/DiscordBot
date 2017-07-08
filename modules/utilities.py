@@ -1,5 +1,6 @@
 import re
 from discord.ext import commands
+from classes import MagicFormatMapping, SafeFormatter
 from ast import literal_eval as make_tuple
 
 def cleanMessage(msg, bot):
@@ -141,6 +142,10 @@ def deleteEntry(storage, tree):
     else:
         deleteEntry(storage[tree[0]], tree[1:])
 
+def safe_format(_string, *args, **kwargs):
+    formatter = SafeFormatter()
+    kwargs = MagicFormatMapping(args, kwargs)
+    return formatter.vformat(_string, args, kwargs)
 
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():
