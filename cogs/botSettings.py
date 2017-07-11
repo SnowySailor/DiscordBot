@@ -277,7 +277,7 @@ class SettingsCommands:
     @rremove.error
     @rreset.error
     @rlist.error
-    @reaction.error
+    @reply.error
     @regex.error
     @probability.error
     async def reactionsError(self, error, ctx):
