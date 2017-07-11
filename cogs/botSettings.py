@@ -201,7 +201,7 @@ class SettingsCommands:
             return
 
     @rchange.command(pass_context=True, no_pm=True)
-    async def reaction(self, ctx, name, newVal):
+    async def reply(self, ctx, name, newVal):
         server = ctx.message.server
         if name in self.bot.servers[server.id].reactions:
             (reg,_,prob) = self.bot.servers[server.id].reactions[name]
