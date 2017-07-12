@@ -16,7 +16,7 @@ class MiscCommands:
     @commands.command(description="Display a fortune from the unix `fortune` program", no_pm=True)
     async def fortune(self):
         """Display a fortune from the unix `fortune` program"""
-        command = "fortune -e fortunes riddles literature"
+        command = "/usr/games/fortune -e fortunes riddles literature"
         output = os.popen(command).read()
         output.strip()
         await self.client.say(output)
