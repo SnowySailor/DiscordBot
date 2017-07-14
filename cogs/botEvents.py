@@ -1,5 +1,7 @@
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
+from modules.messageRateLimiter import isRateLimited, handleRateLimit
 from discord.ext import commands
+from discord import PrivateChannel
 
 
 class BotEvents:
@@ -18,10 +20,25 @@ class BotEvents:
             # Add a new server to the server dict.
             self.bot.addServer(msg.server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
 
+        await self.client.process_commands(msg)
+
         # Server is None if the msg is a PM.
         # Use direct reference to "None" to avoid confusion
-        if msg.server is None:
+        if type(msg.channel) is PrivateChannel:
             await handlePersonalMessage(msg, self.bot, self.client)
+            return
+
+        # Check to see if we should limit the message rate
+        if ('spamFilter' in self.bot.servers[msg.server.id].settings
+                and self.bot.servers[msg.server.id].settings['spamFilter']['enable']
+                and isRateLimited(self.bot.redis, 
+                    self.bot.servers[msg.server.id].settings, msg)):
+            key = msg.server.id + "." + msg.author.id
+            if self.bot.redis.get(key) is False:
+                await handleRateLimit(self.bot, self.client, msg,
+                    self.bot.servers[msg.server.id].settings['spamFilter'])
+                # Set value to True to say we have handled this instance
+                self.bot.redis.set(key, True)
             return
 
         # If the bot was mentioned directly handle that in a special way

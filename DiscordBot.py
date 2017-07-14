@@ -9,32 +9,33 @@ from cogs.botUtilities import UtilityCommands
 from cogs.botMisc import MiscCommands
 from cogs.botEvents import BotEvents
 
-from modules.parseSettings import getSettings, parseServerSettings
+from utilities.parseSettings import getSettings, parseTypedSettings
 
-# Perhaps there is a better way to manage this sort of thing
-# TODO: Remove the defaultSettings from going into the bot,
-#       make new attr that is 'token' only.
 parsedSettings = getSettings('config.yaml')
 parsedReactions = getSettings('reactions.yaml')
 botSettings = parsedSettings['bot']
-defaultServerSettings = parseServerSettings(parsedSettings['serverSettings'])
+defaultServerSettings = parseTypedSettings(parsedSettings['serverSettings'])
 
 bot = DiscordBot(defaultServerSettings, botSettings, parsedReactions)
 client = commands.Bot(command_prefix=commands
                       .when_mentioned_or(bot.botSettings['prefix']), 
                       description="I am your best friend")
 
-client.add_cog(Music(client))
-client.add_cog(SettingsCommands(client, bot))
-client.add_cog(UtilityCommands(client, bot))
-client.add_cog(MiscCommands(client, bot))
-client.add_cog(BotEvents(client, bot))
-
 if not discord.opus.is_loaded():
     if 'opusLocation' in bot.botSettings:
         discord.opus.load_opus(bot.botSettings['opusLocation'])
     else:
         sys.exit("Failed to find opusLocation in config.yaml")
+
+@client.event
+async def on_message(msg):
+    return
+
+client.add_cog(Music(client))
+client.add_cog(SettingsCommands(client, bot))
+client.add_cog(UtilityCommands(client, bot))
+client.add_cog(MiscCommands(client, bot))
+client.add_cog(BotEvents(client, bot))
 
 # @client.command(description="Server info")
 # async def serverinfo():

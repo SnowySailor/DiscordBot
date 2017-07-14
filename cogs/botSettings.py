@@ -1,8 +1,8 @@
 from discord.ext import commands
-from modules.utilities import parse, listSettings, setValue, getValue, deleteEntry, verifySetting
+from utilities.utilities import parse, listSettings, setValue, getValue, deleteEntry, verifySetting
 import re
 import copy
-#from modules.utilities import requireServer
+#from utilities.utilities import requireServer
 
 
 class SettingsCommands:

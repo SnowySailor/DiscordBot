@@ -1,7 +1,10 @@
+import redis
 import os
 import pickle
 from enum import Enum
 from markovgen import Markov
+from string import Formatter
+from collections import Mapping
 try:
     from _string import formatter_field_name_split
 except ImportError:
@@ -14,6 +17,10 @@ class DiscordBot:
         self.defaultServerReactions = reactions
         self.botSettings = botSettings
         self.servers = dict()
+        # # Only create a redis instance if we need it
+        # if ('redisLimit' in self.botSettings and 
+        #         self.botSettings['redisLimit']):
+        self.redis = redis.StrictRedis()
 
     def addServer(self, server, settings=None, reactions=None, messages=0):
         if server.id in self.servers:
@@ -23,6 +30,9 @@ class DiscordBot:
         if not reactions:
             reactions = self.defaultServerReactions
         self.servers[server.id] = DiscordServer(server, settings, reactions, messages)
+
+    class RateLimitException(Exception):
+        pass
 
 
 class DiscordServer:
@@ -48,11 +58,11 @@ class DiscordServer:
                 # We can load the markov if there are messages in the file
                 if i > 1:
                     lengthRestriction = None
-                    if 'markovDigestLength' in self.settings['markov']:
-                        lengthRestriction = self.settings['markov']['markovDigestLength'][0]
-                    elif 'markovSentenceLength' in settings['markov']:
-                        lengthRestriction = self.settings['markov']['markovSentenceLength'][0]
-                    self.markov = Markov(f, self.settings['markov']['maxMarkovBytes'][0], False, lengthRestriction)
+                    if 'digestLength' in self.settings['markov']:
+                        lengthRestriction = self.settings['markov']['digestLength'][0]
+                    elif 'sentenceLength' in settings['markov']:
+                        lengthRestriction = self.settings['markov']['sentenceLength'][0]
+                    self.markov = Markov(f, self.settings['markov']['maxBytes'][0], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
     def saveSettingsState(self):
@@ -87,13 +97,12 @@ class TimeDenum(Enum):
     M = 2
     H = 3
 
+
+# Classes for safely allowing users to use custom format strings in bot replies.
 class AccessData:
     def __init__(self, author, clientUser):
         self.author = author
         self.clientUser = clientUser
-
-from string import Formatter
-from collections import Mapping
 
 class MagicFormatMapping(Mapping):
     """This class implements a dummy wrapper to fix a bug in the Python

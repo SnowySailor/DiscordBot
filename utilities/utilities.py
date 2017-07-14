@@ -36,9 +36,9 @@ def logMessage(msg, bot):
 
     # If the message is longer than the min sentence length we can process and log it
     lineLen = len(line.split())
-    if (('markovSentenceLength' in bot.servers[serverId].settings['markov'] and
-            lineLen >= bot.servers[serverId].settings['markov']['markovSentenceLength'][0]) or
-            ('markovSentenceLength' not in bot.servers[serverId].settings['markov'] and lineLen >= 5)):
+    if (('sentenceLength' in bot.servers[serverId].settings['markov'] and
+            lineLen >= bot.servers[serverId].settings['markov']['sentenceLength'][0]) or
+            ('sentenceLength' not in bot.servers[serverId].settings['markov'] and lineLen >= 5)):
 
         serverId = msg.server.id
         with open("logs/{}_chat_log".format(serverId), "a", encoding='utf-8', errors='ignore') as f:
@@ -52,9 +52,9 @@ def logMessage(msg, bot):
 
             # We also can just digest the data right here and we
             # don't have to worry about doing it later
-            if (('markovDigestLength' in bot.servers[serverId].settings['markov'] and
-                    lineLen >= bot.servers[serverId].settings['markov']['markovDigestLength'][0]) or
-                    ('markovDigestLength' not in bot.servers[serverId].settings['markov'])):
+            if (('digestLength' in bot.servers[serverId].settings['markov'] and
+                    lineLen >= bot.servers[serverId].settings['markov']['digestLength'][0]) or
+                    ('digestLength' not in bot.servers[serverId].settings['markov'])):
                 bot.servers[serverId].markov.digest_single_message(line)
 
         print("New message count for", serverId, "is", bot.servers[serverId].markov.line_size)
