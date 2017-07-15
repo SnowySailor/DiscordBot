@@ -147,6 +147,11 @@ def safe_format(_string, *args, **kwargs):
     kwargs = MagicFormatMapping(args, kwargs)
     return formatter.vformat(_string, args, kwargs)
 
+def updateKey(redis, key, value):
+    lua = "local pttl = redis.call('pttl', ARGV[1]) if pttl > 0 "\
+        "then return redis.call('PSETEX', ARGV[1], pttl, ARGV[2]) end"
+    return redis.eval(lua, 0, key, value)
+
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():
 #     def predicate(ctx):

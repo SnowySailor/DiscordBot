@@ -1,7 +1,5 @@
 from modules.messageResponder import reactToMessage
-from modules.messageRateLimiter import isRateLimited
 from utilities.utilities import logMessage
-from classes import DiscordBot
 
 # This function should contain only message responses to what users say
 # It should not contain actual commands or utilities.

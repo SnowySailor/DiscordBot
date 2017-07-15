@@ -1,7 +1,7 @@
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 from modules.messageRateLimiter import isRateLimited, handleRateLimit
 from discord.ext import commands
-from discord import PrivateChannel
+from utilities.utilities import parse, updateKey
 
 
 class BotEvents:
@@ -24,7 +24,7 @@ class BotEvents:
 
         # Server is None if the msg is a PM.
         # Use direct reference to "None" to avoid confusion
-        if type(msg.channel) is PrivateChannel:
+        if msg.channel.is_private:
             await handlePersonalMessage(msg, self.bot, self.client)
             return
 
@@ -34,11 +34,15 @@ class BotEvents:
                 and isRateLimited(self.bot.redis, 
                     self.bot.servers[msg.server.id].settings, msg)):
             key = msg.server.id + "." + msg.author.id
-            if self.bot.redis.get(key) is False:
-                await handleRateLimit(self.bot, self.client, msg,
-                    self.bot.servers[msg.server.id].settings['spamFilter'])
+            if parse(self.bot.redis.get(key), bool) is False:
                 # Set value to True to say we have handled this instance
-                self.bot.redis.set(key, True)
+                updateKey(self.bot.redis, key, True)
+                try:
+                    await handleRateLimit(self.bot, self.client, msg,
+                        self.bot.servers[msg.server.id].settings['spamFilter'])
+                except Exception:
+                    # If the handle failed, undo the handle indication
+                    updateKey(self.bot.redis, key, False)
             return
 
         # If the bot was mentioned directly handle that in a special way

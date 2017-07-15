@@ -20,7 +20,7 @@ class DiscordBot:
         # # Only create a redis instance if we need it
         # if ('redisLimit' in self.botSettings and 
         #         self.botSettings['redisLimit']):
-        self.redis = redis.StrictRedis()
+        self.redis = redis.StrictRedis(decode_responses=True)
 
     def addServer(self, server, settings=None, reactions=None, messages=0):
         if server.id in self.servers:
