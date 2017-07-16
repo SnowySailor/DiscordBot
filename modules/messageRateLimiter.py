@@ -1,4 +1,5 @@
 import discord
+from utilities.utilities import getValue, setValue
 
 def isRateLimited(redis, server, msg):
     key = msg.server.id + "." + msg.author.id
@@ -31,7 +32,7 @@ def isRateLimited(redis, server, msg):
 async def handleRateLimit(bot, client, msg, settings):
     if ("muteUser" in settings and
             settings['muteUser']):
-        await muteUser(client, msg)
+        await muteUser(client, msg, bot)
     if ("notifyAdmin" in settings and 
             settings['notifyAdmin']):
         await messageAdmins(client, msg)
@@ -57,7 +58,7 @@ async def messageAdmins(client, msg):
             pass
     return
 
-async def muteUser(client, msg):
+async def muteUser(client, msg, bot):
     # Locate the muted user role
     timeoutRole = tryGetMuteRole(client, msg)
     if timeoutRole is None:
@@ -65,7 +66,7 @@ async def muteUser(client, msg):
         if timeoutRole is None:
             return
     muted = await tryAddMuteRole(client, msg, timeoutRole)
-    _ = await tryOverwriteChannelPermissions(client, msg, timeoutRole,
+    _ = await tryOverwriteChannelPermissions(client, msg, timeoutRole, bot,
         send_messages=False, send_tts_messages=False)
     if muted:
         # Message the user that got muted
@@ -118,20 +119,27 @@ async def tryAddMuteRole(client, msg, role):
         return False
     return
 
-async def tryOverwriteChannelPermissions(client, msg, muteRole, **kwargs):
+async def tryOverwriteChannelPermissions(client, msg, muteRole, bot, **kwargs):
+    serverId = msg.server.id
+    serverChanOW = bot.servers[serverId].channelOverwrites
     failures = []
     overwrite = discord.PermissionOverwrite()
-    for k, v in kwargs:
+    for k, v in kwargs.items():
         setattr(overwrite, k, v)
     for channel in msg.server.channels:
-        try:
-            await client.edit_channel_permissions(channel, muteRole, overwrite)
-        except Exception:
-            failures.append(channel.name)
-            pass
+        if channel.type is discord.ChannelType.voice:
+            continue
+        if not getValue(serverChanOW, [channel.id, muteRole.id]):
+            try:
+                await client.edit_channel_permissions(channel, muteRole,
+                    overwrite)
+                setValue(serverChanOW, [channel.id], {muteRole.id: True})
+            except discord.Forbidden:
+                failures.append(channel.name)
     if len(failures) > 0:
         await client.send_message(msg.server.owner, "I was unable to edit "\
-            "channel permissions in these channels for {}: {}. Please edit "\
-            "the `timeout` role so that it cannot send messages or send TTS "\
-            "messages in those.".format(msg.server.name, ', '.join(failures)))
+            "channel permissions in these channels for {}: {}. Please give "\
+            "me channel manage permissions or edit the `timeout` role so "\
+            "it cannot send messages or send TTS messages in those channels."
+            .format(msg.server.name, ', '.join(failures)))
     return failures

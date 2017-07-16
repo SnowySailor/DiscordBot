@@ -31,14 +31,14 @@ class DiscordBot:
             reactions = self.defaultServerReactions
         self.servers[server.id] = DiscordServer(server, settings, reactions, messages)
 
-    class RateLimitException(Exception):
-        pass
-
 
 class DiscordServer:
     def __init__(self, server, settings, reactions, messages=0):
         self.markov = Markov(initEmpty=True)
         self.server = server
+        # Channel permissions overwrites.
+        # dict = {channel.id: {role.id: bool}}
+        self.channelOverwrites = dict()
 
         # Check to see if we have serialized data stored for this server
         # `settings` and `reactions` hold individual settings for each server
