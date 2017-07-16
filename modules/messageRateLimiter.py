@@ -45,12 +45,18 @@ async def messageAdmins(client, msg):
     if msg.server.large:
         await client.request_offline_members(msg.server)
     admins = []
+    # Find the admins
+    # It's likely more efficient to look them up this way considering
+    # spam isn't likely to happen often and checking to see if a user
+    # is an admin on every single user update would cost a lot in the
+    # long run.
     for member in msg.server.members:
         perms = msg.channel.permissions_for(member)
         if perms.administrator:
             admins.append(member)
     for admin in admins:
         try:
+            # Message the admins of the server about the spam
             await client.send_message(admin, "{0.author.mention} has sent "\
             "a lot of messages in a short amount of time in {0.server.name}."\
             " Channel #{0.channel.name}".format(msg))
@@ -61,13 +67,17 @@ async def messageAdmins(client, msg):
 async def muteUser(client, msg, bot):
     # Locate the muted user role
     timeoutRole = tryGetMuteRole(client, msg)
+    # If we couldn't locate, need to create one
     if timeoutRole is None:
         timeoutRole = await tryCreateMuteRole(client, msg)
+        # If we still couldn't create one, then we have to stop here
         if timeoutRole is None:
             return
-    muted = await tryAddMuteRole(client, msg, timeoutRole)
+    # Try to edit channel permissions to block messages from being sent
     _ = await tryOverwriteChannelPermissions(client, msg, timeoutRole, bot,
         send_messages=False, send_tts_messages=False)
+    # Try to mute the user
+    muted = await tryAddMuteRole(client, msg, timeoutRole)
     if muted:
         # Message the user that got muted
         await client.send_message(msg.author, "You have been silenced "\
@@ -88,9 +98,10 @@ def tryGetMuteRole(client, msg):
 
 async def tryCreateMuteRole(client, msg):
     try:
-        # Create a role that doesn't allow the user to send messages
+        # Create permissions that don't allow the user to send messages
         newPerm = discord.Permissions(permissions=66560,
             send_messages=False, send_tts_messages=False)
+        # Create the actual role
         timeoutRole = await client.create_role(msg.server,
             permissions=newPerm, name="timeout",
             color=discord.Colour.default(), hoist=False,
@@ -123,12 +134,17 @@ async def tryOverwriteChannelPermissions(client, msg, muteRole, bot, **kwargs):
     serverId = msg.server.id
     serverChanOW = bot.servers[serverId].channelOverwrites
     failures = []
+    # Get a default channel overwrite
     overwrite = discord.PermissionOverwrite()
+    # Apply settings from kwargs
     for k, v in kwargs.items():
         setattr(overwrite, k, v)
     for channel in msg.server.channels:
+        # Ignore the voice channels
         if channel.type is discord.ChannelType.voice:
             continue
+        # Check to see if we've already modified the channels for this role
+        # If not, we need to modify them
         if not getValue(serverChanOW, [channel.id, muteRole.id]):
             try:
                 await client.edit_channel_permissions(channel, muteRole,
@@ -136,6 +152,8 @@ async def tryOverwriteChannelPermissions(client, msg, muteRole, bot, **kwargs):
                 setValue(serverChanOW, [channel.id], {muteRole.id: True})
             except discord.Forbidden:
                 failures.append(channel.name)
+    # If there were any failures due to permissions, we need to tell the owner
+    # to either allow us to edit the permissions or have them do it
     if len(failures) > 0:
         await client.send_message(msg.server.owner, "I was unable to edit "\
             "channel permissions in these channels for {}: {}. Please give "\
