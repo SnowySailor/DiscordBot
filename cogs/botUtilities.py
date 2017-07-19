@@ -76,7 +76,7 @@ class UtilityCommands:
             # Requires Python 3.6+
             name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         if ('maxTimerSeconds' in self.bot.servers[serverId].settings and
-                timeNum > self.bot.servers[serverId].settings['maxTimerSeconds']):
+                timeNum > self.bot.servers[serverId].settings['maxTimerSeconds'][0]):
             await self.client.say("The time requested is too much. Please use a smaller number.")
             return
         await self.client.say("Timer called `{}` started. It will expire in {}.".format(name, expireTime))
