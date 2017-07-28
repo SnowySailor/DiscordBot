@@ -38,7 +38,11 @@ class DiscordServer:
         self.server = server
         # Channel permissions overwrites.
         # dict = {channel.id: {role.id: bool}}
+        # TODO: Change to a set inside the dict
         self.channelOverwrites = dict()
+        
+        self.whitelistChannels = set()
+        self.whitelistRoles = set()
 
         # Check to see if we have serialized data stored for this server
         # `settings` and `reactions` hold individual settings for each server

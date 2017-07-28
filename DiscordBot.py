@@ -8,6 +8,7 @@ from cogs.botSettings import SettingsCommands
 from cogs.botUtilities import UtilityCommands
 from cogs.botMisc import MiscCommands
 from cogs.botEvents import BotEvents
+from cogs.botUserManagement import BotUserManagement
 
 from utilities.parseSettings import getSettings, parseTypedSettings
 
@@ -36,6 +37,7 @@ client.add_cog(SettingsCommands(client, bot))
 client.add_cog(UtilityCommands(client, bot))
 client.add_cog(MiscCommands(client, bot))
 client.add_cog(BotEvents(client, bot))
+client.add_cog(BotUserManagement(client, bot))
 
 # @client.command(description="Server info")
 # async def serverinfo():

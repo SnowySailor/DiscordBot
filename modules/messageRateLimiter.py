@@ -1,7 +1,13 @@
 import discord
 from utilities.utilities import getValue, setValue
 
-def isRateLimited(redis, server, msg):
+def isRateLimited(redis, server, msg, bot):
+    if msg.channel.id in bot.servers[msg.server.id].whitelistChannels:
+        # The channel is whitelisted
+        return
+    if len(set(msg.author.roles).intersection(msg.server.roles)) > 0:
+        # At least 1 of the user's roles were whitelisted
+        return
     key = msg.server.id + "." + msg.author.id
     if redis.get(key) is None:
         redis.psetex(key, 3000, False)
@@ -13,7 +19,7 @@ def isRateLimited(redis, server, msg):
             return True
 #        elif expireTime > 6000:
 #            return 
-# Figure something out to return as a "warning" sign
+# Figure something out to return as a "warning"
         elif expireTime is -1:
             # No expire time set
             return False

@@ -32,7 +32,7 @@ class BotEvents:
         if ('spamFilter' in self.bot.servers[msg.server.id].settings
                 and self.bot.servers[msg.server.id].settings['spamFilter']['enable']
                 and isRateLimited(self.bot.redis, 
-                    self.bot.servers[msg.server.id].settings, msg)):
+                    self.bot.servers[msg.server.id].settings, msg, bot)):
             key = msg.server.id + "." + msg.author.id
             if parse(self.bot.redis.get(key), bool) is False:
                 # Set value to True to say we have handled this instance

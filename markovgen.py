@@ -14,6 +14,7 @@ class Markov(object):
                     self.line_size = 0
                 else:
                     self.cache = {}
+                    self.trippleCache = {}
                     self.open_file = open_file
                     self.lines = self.file_to_lines(max_size, min_length)
                     self.line_size = len(self.lines)
@@ -59,13 +60,63 @@ class Markov(object):
                                 yield (line[i], line[i+1], line[i+2])
                         yield(line[len(line) - 2], line[len(line) - 1], "\n")
 
+        def quadruples(self):
+            for line in self.lines:
+                line = line.split()
+                if len(line) < 4:
+                    continue
+                for i in range(len(line) - 3):
+                    yield (line[i], line[i+1], line[i+2], line[i+3])
+                yield (line[len(line)-3], line[len(line)-2], line[len(line)-1], "\n")
+
         def database(self):
-                for w1, w2, w3 in self.triples():
-                        key = (w1, w2)
-                        if key in self.cache:
-                                self.cache[key].append(w3)
-                        else:
-                                self.cache[key] = [w3]
+                # for w1, w2, w3 in self.triples():
+                #         key = (w1, w2)
+                #         if key in self.cache:
+                #                 self.cache[key].append(w3)
+                #         else:
+                #                 self.cache[key] = [w3]
+                for w1, w2, w3, w4 in self.quadruples():
+                    key = (w1,w2,w3)
+                    if key in self.trippleCache:
+                        self.trippleCache[key].append(w4)
+                    else:
+                        self.trippleCache[key] = [w4]
+
+        def generate_tripple_markov_text(self, size=25):
+                while True:
+                    seed_line = self.lines[random.randint(0, self.line_size)].split()
+                    if len(seed_line) > 3:
+                        break
+                seed_word, next_word, last_word = seed_line[0], seed_line[1], seed_line[2]
+                w1, w2, w3 = seed_word, next_word, last_word
+                gen_words = []
+                while True:
+                        if(w1 == "\n"):
+                            break
+                        gen_words.append(w1)
+                        if(w2 == "\n"):
+                            break
+                        if(w3 == "\n"):
+                            break
+                        """ Get new words with more tollerance to letter case
+                            Given a string like
+                                "Hello there Tim and Bob"
+                                Where w1 = "there"
+                                      w2 = "Tim"
+                                      (new word "and")
+                            It could also select "it's" from a string like
+                                "Look over there tim it's a seagull"
+                            Because we also check to see if there are lower case versions
+                            of the (w1,w2) pair in the cache.
+                        """
+                        #lowerKeyList = []
+                        #if (w1.lower(),w2.lower()) in self.cache:
+                        #    lowerKeyList = self.cache[(w1.lower(),w2.lower())]
+                        #w1, w2 = w2, random.choice(list(set().union(self.cache[(w1, w2)], lowerKeyList)))
+                        w1, w2, w3 = w2, w3, random.choice(self.trippleCache[(w1, w2, w3)])
+                """gen_words.append(w3) """
+                return ' '.join(gen_words)
 
         def generate_markov_text(self, size=25):
                 while True:
