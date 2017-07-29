@@ -1,5 +1,6 @@
 from discord.ext import commands
 import re
+import discord
 
 class BotUserManagement:
     def __init__(self, client, bot):
@@ -9,35 +10,43 @@ class BotUserManagement:
     @commands.group(pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
     async def spam(self, ctx):
+        if ctx.invoked_subcommand is None:
+            raise commands.BadArgument
+            return
         return
 
     @spam.group(pass_context=True)
     async def whitelist(self, ctx):
+        if ctx.invoked_subcommand is None:
+            raise commands.BadArgument
+            return
         return
 
     @whitelist.group(pass_context=True)
-    async def list(self, ctx):
+    async def add(self, ctx):
+        if ctx.invoked_subcommand is None:
+            raise commands.BadArgument
+            return
         return
 
     @whitelist.group(pass_context=True)
-    async def channel(self, ctx):
+    async def remove(self, ctx):
+        if ctx.invoked_subcommand is None:
+            raise commands.BadArgument
+            return
         return
 
-    @whitelist.group(pass_context=True)
-    async def role(self, ctx):
-        return
-
-    @channel.comand(pass_context=True)
-    async def add(self, ctx, cid):
+    @add.command(name="channel", pass_context=True)
+    async def channeladd(self, ctx, cid):
         # remove <# and > from channel mention
         cid = re.sub(r"(^<#)|>", "", cid)
         chan = ctx.message.channel
-        if (discord.utils.get(ctx.message.server.channels, id=cid, 
+        if (discord.utils.get(ctx.message.server.channels, id=cid,
                 type=discord.ChannelType.text) is None):
             await self.client.send_message(chan, "That channel isn't valid.")
             return
         serverId = ctx.message.server.id
-        if cid not in bot.servers[serverId].whitelistChannels:
+        if cid not in self.bot.servers[serverId].whitelistChannels:
             self.bot.servers[serverId].whitelistChannels.add(cid)
             await self.client.send_message(chan, "Channel whitelisted.")
         else:
@@ -46,7 +55,7 @@ class BotUserManagement:
         return
         return
 
-    @role.command(name="add", pass_context=True)
+    @add.command(name="role", pass_context=True)
     async def roleadd(self, ctx, rid):
         # remove <@& and > from "<@&172688478646173696>"
         rid = re.sub(r"(^<@&)|>", "", rid)
@@ -65,8 +74,8 @@ class BotUserManagement:
                 "whitelisted.")
         return
 
-    @channel.comand(pass_context=True)
-    async def remove(self, ctx, cid):
+    @remove.command(name="channel", pass_context=True)
+    async def channelremove(self, ctx, cid):
         # remove <# and > from channel mention
         cid = re.sub(r"(^<#)|>", "", cid)
         chan = ctx.message.channel
@@ -75,7 +84,7 @@ class BotUserManagement:
             await self.client.send_message(chan, "That channel isn't valid.")
             return
         serverId = ctx.message.server.id
-        if cid in bot.servers[serverId].whitelistChannels:
+        if cid in self.bot.servers[serverId].whitelistChannels:
             self.bot.servers[serverId].whitelistChannels.remove(cid)
             await self.client.send_message(chan, "Channel un-whitelisted.")
         else:
@@ -83,7 +92,7 @@ class BotUserManagement:
                 "whitelisted.")
         return
         
-    @role.command(name="remove", pass_context=True)
+    @remove.command(name="role", pass_context=True)
     async def roleremove(self, ctx, rid):
         # remove <@& and > from "<@&172688478646173696>"
         rid = re.sub(r"(^<@&)|>", "", rid)
@@ -99,4 +108,26 @@ class BotUserManagement:
             await chan.send_message("Role un-whitelisted.")
         else:
             await self.client.send_message(chan, "That role isn't whitelisted.")
+        return
+
+    @whitelist.command(name="roles", pass_context=True)
+    async def listroles(self, ctx):
+        if len(self.bot.servers[ctx.message.server.id].whitelistRoles) is 0:
+            await self.client.send_message(ctx.message.channel, "No roles "\
+                "whitelisted.")
+            return
+        li = '\n'.join("<@{}>".format(x) for x in 
+            self.bot.servers[ctx.message.server.id].whitelistRoles)
+        await self.client.send_message(ctx.message.channel, li)
+        return
+
+    @whitelist.command(name="channels", pass_context=True)
+    async def listchannels(self, ctx):
+        if len(self.bot.servers[ctx.message.server.id].whitelistChannels) is 0:
+            await self.client.send_message(ctx.message.channel, "No channels"\
+                " whitelisted.")
+            return
+        li = '\n'.join("<#{}>".format(x) for x in 
+            self.bot.servers[ctx.message.server.id].whitelistChannels)
+        await self.client.send_message(ctx.message.channel, li)
         return
