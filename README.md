@@ -25,3 +25,6 @@ Configure a config.yaml based on the example.
   * Place user into timeout group that doesn't allow messages to be sent (option) if they spam
   * Message moderators/admins
 5. Allow different chain lengths for markov (low priority, high memory usage potential)
+6. Allow messages to be sent to specific channels and servers by bot admins
+  * $sendMessage channel [serverId].[channelId/channelName] message
+  * $sendMessage user [userId] message
