@@ -23,6 +23,6 @@ Configure a config.yaml based on the example.
   * Delete messages (option) if they exceed a certain number in X seconds
   * Delete message as it comes in if the rate is limited
 4. Allow different chain lengths for markov (low priority, high memory usage potential)
-5. Allow messages to be sent to specific channels and servers by bot admins
-  * $sendMessage channel [serverId].[channelId/channelName] message
-  * $sendMessage user [userId] message
+5. Store settings and reactions as json/yaml instead of pickle
+  * Pickle isn't easy to manually edit if you wanted to
+  * 5.1 Write script to automatically merge old and new settings files so that if new settings are added, they get put into the server's file

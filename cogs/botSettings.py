@@ -186,8 +186,12 @@ class SettingsCommands:
                     return
             try:
                 probability = int(probability)
+                assert probability >= 0
             except ValueError:
                 await self.client.say("Your probability must be an integer.")
+                return
+            except AssertionError:
+                await self.client.say("Please use a positive integer.")
                 return
             self.bot.servers[server.id].reactions[name] = (regex, reply, probability)
             self.bot.servers[server.id].saveReactionsState()
@@ -237,8 +241,12 @@ class SettingsCommands:
         if name in self.bot.servers[server.id].reactions:
             try:
                 newVal = int(newVal)
+                assert newVal >= 0
             except ValueError:
                 await self.client.say("Your probability must be an integer.")
+                return
+            except AssertionError:
+                await self.client.say("Please use a positive integer.")
                 return
             (reg,react,_) = self.bot.servers[server.id].reactions[name]
             newTuple = (reg, react, newVal)
