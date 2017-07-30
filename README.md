@@ -26,3 +26,4 @@ Configure a config.yaml based on the example.
 5. Store settings and reactions as json/yaml instead of pickle
   * Pickle isn't easy to manually edit if you wanted to
   * 5.1 Write script to automatically merge old and new settings files so that if new settings are added, they get put into the server's file
+6. Move the spam trigger stuff into the message handler instead of botEvents
