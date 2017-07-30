@@ -152,6 +152,11 @@ def updateKey(redis, key, value):
         "then return redis.call('PSETEX', ARGV[1], pttl, ARGV[2]) end"
     return redis.eval(lua, 0, key, value)
 
+def verifyAdmin(user, admins):
+    if user.id in admins:
+        return True
+    return False
+
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():
 #     def predicate(ctx):
