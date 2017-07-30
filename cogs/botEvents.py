@@ -63,11 +63,10 @@ class BotEvents:
         print('------')
 
     async def on_command_error(self, error, ctx):
-        if isinstance(error, commands.errors.CommandNotFound):
-            await ctx.bot.send_message(ctx.message.channel, "Invalid command.")
-        elif isinstance(error, commands.errors.NoPrivateMessage):
+        if isinstance(error, commands.errors.NoPrivateMessage):
             await ctx.bot.send_message(ctx.message.channel,
                             "You can't use this command in private messages.")
         else:
             print(type(error))
         #elif isinstance(error, commands.errors.)
+        

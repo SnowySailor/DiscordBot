@@ -3,6 +3,7 @@ bot: # All of the settings for the bot itself should go here.
   token: BOT_TOKEN # Your bot token from the online Discord bot page
   prefix: "$" # What people will say to call a bot command
   opusLocation: "/usr/local/lib/libopus.so" # Example opus location on disc
+  botAdmins: ["userId1", "userId2"] # Admins of the bot itself. They can do dangerous things.
 
 # General settings
 # These will be the DEFAULT server settings.
