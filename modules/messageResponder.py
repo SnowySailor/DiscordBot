@@ -2,7 +2,7 @@ import re
 import random
 import os
 from classes import AccessData
-from modules.utilities import safe_format
+from utilities.utilities import safe_format
 
 # Handles message reactions
 async def reactToMessage(msg, bot, client):
@@ -48,11 +48,11 @@ async def reactToMessage(msg, bot, client):
             await client.send_message(msg.channel, "_{} pats you on the head_".format(client.user.name))
         return
 
-    if ('markovEnable' in bot.servers[msg.server.id].settings['markov'] 
-            and bot.servers[msg.server.id].settings['markov']['markovEnable'][0] 
+    if ('enable' in bot.servers[msg.server.id].settings['markov'] 
+            and bot.servers[msg.server.id].settings['markov']['enable'][0] 
             and re.match("^bot be random", msg.content, re.IGNORECASE)):
         if (bot.servers[msg.server.id].markov.line_size < 
-                bot.servers[msg.server.id].settings['markov']['minMarkov'][0]):
+                bot.servers[msg.server.id].settings['markov']['min'][0]):
             await client.send_message(msg.channel, "Not enough data.")
             return
         if bot.servers[msg.server.id].markov is not None:
