@@ -10,18 +10,23 @@ bot: # All of the settings for the bot itself should go here.
 serverSettings:
   maxTimerSeconds: 10800 # Max time allowed on a timer in seconds. This is 3 hours.
   reactionsEnable: True # Do you want to enable message reactions?
+  spamFilter: # Spam filter settings
+    enable: False # Do you want to enable the filter?
+    notifyAdmin: True # Do you want admins to be notified?
+    giveWarning: True # Do you want to give the user a warning?
+    muteUser: False # Do you want to mute the user that spammed?
   markov: # All of the markov settings should be stored here
-    markovEnable: True # Do you want to have markov enabled?
-    minMarkov: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
-    maxMarkovBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
+    enable: True # Do you want to have markov enabled?
+    min: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
+    maxBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
                             # to put this into reference, the average word length is 5 characters. Most words
                             # written will just be aschii characters which utf-8 sees as 1 byte.
                             # If you know how many words you want to have stored, multiply that number by
                             # 5 (characters in each word) and you should get a number of bytes to use.
                             # Something else to consider is the fact that Python memory usage isn't perfect
                             # so the actual memory usage will probably be a fair amount more than the number here
-    markovSentenceLength: 5 # Number of words a message must be in order to be considered good data
-    markovDigestLength: 15 # Only add messages longer than this length to the current markov object
+    sentenceLength: 5 # Number of words a message must be in order to be considered good data
+    digestLength: 15 # Only add messages longer than this length to the current markov object
     removeNonAlphanumWords: True # Do you want to treat single-character words like # or % as real words?
     removeHttpLinks: True # Do you want to remove http links from messages?
     removeHereEveryone: True # Remove @here and @everyone from messages the bot logs
