@@ -47,6 +47,7 @@ class BotUserManagement:
         serverId = ctx.message.server.id
         if cid not in self.bot.servers[serverId].whitelistChannels:
             self.bot.servers[serverId].whitelistChannels.add(cid)
+            self.bot.servers[serverId].dumpToYamlData("whitelistChannels")
             await self.client.say("Channel whitelisted.")
         else:
             await self.client.say("That channel is already whitelisted.")
@@ -72,6 +73,7 @@ class BotUserManagement:
         serverId = ctx.message.server.id
         if rid not in self.bot.servers[serverId].whitelistRoles:
             self.bot.servers[serverId].whitelistRoles.add(rid)
+            self.bot.servers[serverId].dumpToYamlData("whitelistRoles")
             await self.client.say("Role whitelisted.")
         else:
             await self.client.say("That role is already whitelisted.")
@@ -88,6 +90,7 @@ class BotUserManagement:
         serverId = ctx.message.server.id
         if cid in self.bot.servers[serverId].whitelistChannels:
             self.bot.servers[serverId].whitelistChannels.remove(cid)
+            self.bot.servers[serverId].dumpToYamlData("whitelistChannels")
             await self.client.say("Channel un-whitelisted.")
         else:
             await self.client.say("That channel isn't whitelisted.")
@@ -104,6 +107,7 @@ class BotUserManagement:
         serverId = ctx.message.server.id
         if rid in self.bot.servers[serverId].whitelistRoles:
             self.bot.servers[serverId].whitelistRoles.remove(rid)
+            self.bot.servers[serverId].dumpToYamlData("whitelistRoles")
             await self.client.say("Role un-whitelisted.")
         else:
             await self.client.say("That role isn't whitelisted.")

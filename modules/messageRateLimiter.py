@@ -153,11 +153,15 @@ async def tryOverwriteChannelPermissions(client, msg, muteRole, bot, **kwargs):
             continue
         # Check to see if we've already modified the channels for this role
         # If not, we need to modify them
-        if not getValue(serverChanOW, [channel.id, muteRole.id]):
+        if channel.id not in serverChanOW:
+            # Create the empty set
+            serverChanOW[channel.id] = set()
+        if muteRole.id not in serverChanOW[channel.id]:
             try:
                 await client.edit_channel_permissions(channel, muteRole,
                     overwrite)
-                setValue(serverChanOW, [channel.id], {muteRole.id: True})
+                serverChanOW[channel.id].add(muteRole.id)
+                bot.servers[serverId].dumpToYamlData("channelOverwrites")
             except discord.Forbidden:
                 failures.append(channel.name)
     # If there were any failures due to permissions, we need to tell the owner
