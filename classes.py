@@ -70,17 +70,6 @@ class DiscordServer:
                     self.markov = Markov(f, self.settings['markov']['maxBytes'][0], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
-    # def saveSettingsState(self):
-    #     with open("data/{}_server_settings.pickle".format(self.server.id), "wb") as f:
-    #         pickle.dump(self.settings, f)
-    #     return
-
-    # def saveReactionsState(self):
-    #     with open("data/{}_reactions.pickle".format(self.server.id), "wb") as f:
-    #         pickle.dump(self.reactions, f)
-    #     return
-
-
     def dumpToYamlData(self, thing):
         # Made sure that there is actually the attribute
         if hasattr(self, thing):
@@ -100,23 +89,6 @@ class DiscordServer:
                 setattr(self, thing, yaml.load(f))
                 return True
         return False
-
-    # def tryLoadSettingsState(self):
-    #     if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
-    #         with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
-    #             # Load the data into the servers variable
-    #             self.settings = pickle.load(f)
-    #         return True
-    #     return False
-
-    # def tryLoadReactionsState(self):
-    #     if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
-    #         with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
-    #             # Load the data into the reactions variable
-    #             self.reactions = pickle.load(f)
-    #         return True
-    #     return False
-
 
 class TimeDenum(Enum):
     S = 1
