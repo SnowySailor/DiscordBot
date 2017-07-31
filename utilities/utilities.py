@@ -66,7 +66,6 @@ def parse(strVal, expectedType):
     if expectedType is int:
         try:
             retVal = int(strVal)
-            print(retVal)
         except ValueError:
             raise ValueError
     elif expectedType is str:

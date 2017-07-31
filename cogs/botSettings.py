@@ -48,7 +48,6 @@ class SettingsCommands:
         if getValue(self.bot.servers[server.id].settings, settingTree):
             await self.client.say("This setting is already in existance.")
             return
-        print(getValue(self.bot.servers[server.id].settings, settingTree))
 
         # Get the type from the default settings
         (_,t) = getValue(self.bot.defaultServerSettings, settingTree)

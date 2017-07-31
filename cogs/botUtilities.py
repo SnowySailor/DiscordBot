@@ -38,7 +38,6 @@ class UtilityCommands:
         callingUser = ctx.message.author.id
         timeSplit = [("".join(x)).strip() for _, x in itertools.groupby(time, key=str.isdigit)]
         timeNum = 0
-        print(timeSplit)
         try:
             timeNum = int(timeSplit[0])
         except ValueError:

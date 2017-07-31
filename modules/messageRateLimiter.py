@@ -5,7 +5,9 @@ def isRateLimited(redis, server, msg, bot):
     if msg.channel.id in bot.servers[msg.server.id].whitelistChannels:
         # The channel is whitelisted
         return
-    if len(set(msg.author.roles).intersection(msg.server.roles)) > 0:
+    if len(bot.servers[msg.server.id].whitelistRoles
+            .intersection(
+            set([x.id for x in msg.author.roles]))) > 0:
         # At least 1 of the user's roles were whitelisted
         return
     key = msg.server.id + "." + msg.author.id
