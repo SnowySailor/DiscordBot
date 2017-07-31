@@ -1,6 +1,6 @@
 import redis
 import os
-import pickle
+import yaml
 from enum import Enum
 from markovgen import Markov
 from string import Formatter
@@ -36,20 +36,21 @@ class DiscordServer:
     def __init__(self, server, settings, reactions, messages=0):
         self.markov = Markov(initEmpty=True)
         self.server = server
-        # Channel permissions overwrites.
-        # dict = {channel.id: {role.id: bool}}
-        # TODO: Change to a set inside the dict
-        self.channelOverwrites = dict()
-        
-        self.whitelistChannels = set()
-        self.whitelistRoles = set()
 
         # Check to see if we have serialized data stored for this server
         # `settings` and `reactions` hold individual settings for each server
-        if not self.tryLoadSettingsState():
+        if not self.readFromYamlData("settings"):
             self.settings = settings
-        if not self.tryLoadReactionsState():
+        if not self.readFromYamlData("reactions"):
             self.reactions = reactions
+        if not self.readFromYamlData("whitelistChannels"):
+            self.whitelistChannels = set()
+        if not self.readFromYamlData("whitelistRoles"):
+            self.whitelistRoles = set()
+        if not self.readFromYamlData("channelOverwrites"):
+            # Permissions overwrites
+            # dict = {channel.id: set()}
+            self.channelOverwrites = dict()
 
         # If the log exists, we can check to see how many lines it has
         if os.path.isfile("logs/{}_chat_log".format(server.id)):
@@ -69,31 +70,52 @@ class DiscordServer:
                     self.markov = Markov(f, self.settings['markov']['maxBytes'][0], False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
-    def saveSettingsState(self):
-        with open("data/{}_server_settings.pickle".format(self.server.id), "wb") as f:
-            pickle.dump(self.settings, f)
+    # def saveSettingsState(self):
+    #     with open("data/{}_server_settings.pickle".format(self.server.id), "wb") as f:
+    #         pickle.dump(self.settings, f)
+    #     return
+
+    # def saveReactionsState(self):
+    #     with open("data/{}_reactions.pickle".format(self.server.id), "wb") as f:
+    #         pickle.dump(self.reactions, f)
+    #     return
+
+
+    def dumpToYamlData(self, thing):
+        # Made sure that there is actually the attribute
+        if hasattr(self, thing):
+            # Get the attribute
+            attr = getattr(self, thing)
+            # Dump it to the correct yaml file
+            with open("data/{}_{}.yaml".format(self.server.id, thing), "w") as f:
+                yaml.dump(attr, f)
+                return True
+        else:
+            raise AttributeError("Object has no attr {}".format(thing))
         return
 
-    def saveReactionsState(self):
-        with open("data/{}_reactions.pickle".format(self.server.id), "wb") as f:
-            pickle.dump(self.reactions, f)
-        return
-
-    def tryLoadSettingsState(self):
-        if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
-            with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
-                # Load the data into the servers variable
-                self.settings = pickle.load(f)
-            return True
+    def readFromYamlData(self, thing):
+        if os.path.isfile("data/{}_{}.yaml".format(self.server.id, thing)):
+            with open("data/{}_{}.yaml".format(self.server.id, thing), "r") as f:
+                setattr(self, thing, yaml.load(f))
+                return True
         return False
 
-    def tryLoadReactionsState(self):
-        if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
-            with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
-                # Load the data into the reactions variable
-                self.reactions = pickle.load(f)
-            return True
-        return False
+    # def tryLoadSettingsState(self):
+    #     if os.path.isfile("data/{}_server_settings.pickle".format(self.server.id)):
+    #         with open("data/{}_server_settings.pickle".format(self.server.id), "rb") as f:
+    #             # Load the data into the servers variable
+    #             self.settings = pickle.load(f)
+    #         return True
+    #     return False
+
+    # def tryLoadReactionsState(self):
+    #     if os.path.isfile("data/{}_reactions.pickle".format(self.server.id)):
+    #         with open("data/{}_reactions.pickle".format(self.server.id), "rb") as f:
+    #             # Load the data into the reactions variable
+    #             self.reactions = pickle.load(f)
+    #         return True
+    #     return False
 
 
 class TimeDenum(Enum):
