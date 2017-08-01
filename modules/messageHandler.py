@@ -7,7 +7,7 @@ from modules.messageRateLimiter import isRateLimited, handleRateLimit
 async def handle(msg, bot, client):
     # Check to see if we should limit the message rate
     if ('spamFilter' in bot.servers[msg.server.id].settings
-            and bot.servers[msg.server.id].settings['spamFilter']['enable']
+            and bot.servers[msg.server.id].settings['spamFilter']['enable'][0]
             and isRateLimited(bot.redis, 
                 bot.servers[msg.server.id].settings, msg, bot)):
         key = msg.server.id + "." + msg.author.id
