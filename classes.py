@@ -5,6 +5,7 @@ from enum import Enum
 from markovgen import Markov
 from string import Formatter
 from collections import Mapping
+from settingsMerger import mergeDicts
 try:
     from _string import formatter_field_name_split
 except ImportError:
@@ -33,14 +34,14 @@ class DiscordBot:
 
 
 class DiscordServer:
-    def __init__(self, server, settings, reactions, messages=0):
+    def __init__(self, server, defaultSettings, defaultReactions, messages=0):
         self.markov = Markov(initEmpty=True)
         self.server = server
 
         # Check to see if we have serialized data stored for this server
         # `settings` and `reactions` hold individual settings for each server
-        if not self.readFromYamlData("settings"):
-            self.settings = settings
+        if not self.readFromYamlData("settings", defaultSettings):
+            self.settings = defaultSettings
         if not self.readFromYamlData("reactions"):
             self.reactions = reactions
         if not self.readFromYamlData("whitelistChannels"):
@@ -83,10 +84,13 @@ class DiscordServer:
             raise AttributeError("Object has no attr {}".format(thing))
         return
 
-    def readFromYamlData(self, thing):
+    def readFromYamlData(self, thing, default=None):
         if os.path.isfile("data/{}_{}.yaml".format(self.server.id, thing)):
             with open("data/{}_{}.yaml".format(self.server.id, thing), "r") as f:
-                setattr(self, thing, yaml.load(f))
+                readData = yaml.load(f)
+                if default is not None:
+                    changes = mergeDicts(default, readData)
+                setattr(self, thing, readData)
                 return True
         return False
 

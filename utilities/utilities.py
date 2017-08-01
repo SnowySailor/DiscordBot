@@ -156,6 +156,7 @@ def verifyAdmin(user, admins):
         return True
     return False
 
+
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():
 #     def predicate(ctx):
