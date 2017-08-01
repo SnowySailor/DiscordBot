@@ -43,7 +43,7 @@ class DiscordServer:
         if not self.readFromYamlData("settings", defaultSettings):
             self.settings = defaultSettings
         if not self.readFromYamlData("reactions"):
-            self.reactions = reactions
+            self.reactions = defaultReactions
         if not self.readFromYamlData("whitelistChannels"):
             self.whitelistChannels = set()
         if not self.readFromYamlData("whitelistRoles"):
