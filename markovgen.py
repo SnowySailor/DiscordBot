@@ -76,7 +76,7 @@ class Markov(object):
                 #                 self.cache[key].append(w3)
                 #         else:
                 #                 self.cache[key] = [w3]
-                for w1, w2, w3 in self.tripples():
+                for w1, w2, w3 in self.triples():
                     key = (w1,w2)
                     if key in self.cache:
                         self.cache[key].append(w3)
