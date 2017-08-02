@@ -76,12 +76,12 @@ class Markov(object):
                 #                 self.cache[key].append(w3)
                 #         else:
                 #                 self.cache[key] = [w3]
-                for w1, w2, w3, w4 in self.quadruples():
-                    key = (w1,w2,w3)
-                    if key in self.trippleCache:
-                        self.trippleCache[key].append(w4)
+                for w1, w2, w3 in self.tripples():
+                    key = (w1,w2)
+                    if key in self.cache:
+                        self.cache[key].append(w3)
                     else:
-                        self.trippleCache[key] = [w4]
+                        self.cache[key] = [w3]
 
         def generate_tripple_markov_text(self, size=25):
                 while True:
