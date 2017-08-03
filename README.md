@@ -23,4 +23,3 @@ Configure a config.yaml based on the example.
   * Delete messages (option) if they exceed a certain number in X seconds
   * Delete message as it comes in if the rate is limited
 4. Allow different chain lengths for markov (low priority, high memory usage potential)
-5. Write script to automatically merge old and new settings files so that if new settings are added, they get put into the server's file
