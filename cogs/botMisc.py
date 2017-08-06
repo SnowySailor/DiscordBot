@@ -6,10 +6,13 @@ class MiscCommands:
         self.client = client
         self.bot = bot
 
-    @commands.command(description="Echo your message", no_pm=True)
-    async def echo(self, *val: str):
+    @commands.command(description="Echo your message", no_pm=True, pass_context=True)
+    async def echo(self, ctx, *val: str):
         """Echo your message"""
-        await self.client.say(' '.join(str(x) for x in val))
+        msg = ctx.message
+        echoMsg = await self.client.say(' '.join(str(x) for x in val))
+        # Add the message id to the echo message log
+        self.bot.servers[msg.server.id].echoMessages[msg.id] = echoMsg
         return
 
 

@@ -37,6 +37,10 @@ class DiscordServer:
     def __init__(self, server, defaultSettings, defaultReactions, messages=0):
         self.markov = Markov(initEmpty=True)
         self.server = server
+        # Set for the echo messages to go into
+        # so that they can be deleted if the sending user deletes their
+        # command message
+        self.echoMessages = dict()
 
         # Check to see if we have serialized data stored for this server
         # `settings` and `reactions` hold individual settings for each server

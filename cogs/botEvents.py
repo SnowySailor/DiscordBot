@@ -36,12 +36,6 @@ class BotEvents:
             await handle(msg, self.bot, self.client)
             return
 
-    async def on_ready(self):
-        print('Logged in as')
-        print(self.client.user.name)
-        print(self.client.user.id)
-        print('------')
-
     async def on_command_error(self, error, ctx):
         if isinstance(error, commands.errors.NoPrivateMessage):
             await ctx.bot.send_message(ctx.message.channel,
@@ -49,4 +43,17 @@ class BotEvents:
         else:
             print(type(error))
         #elif isinstance(error, commands.errors.)
+
+    async def on_message_delete(self, msg):
+        # If a user sends an echo command then deletes their message,
+        # we delete the message that the bot sent (the echo)
+        if msg.id in self.bot.servers[msg.server.id].echoMessages:
+            msgDel = self.bot.servers[msg.server.id].echoMessages[msg.id]
+            await self.client.delete_message(msgDel)
+        return
         
+    async def on_ready(self):
+        print('Logged in as')
+        print(self.client.user.name)
+        print(self.client.user.id)
+        print('------')
