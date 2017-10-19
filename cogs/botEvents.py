@@ -1,5 +1,7 @@
 from discord.ext import commands
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
+from classes import AccessData
+from utilities.utilities import safe_format
 
 class BotEvents:
     def __init__(self, client, bot):
@@ -54,10 +56,21 @@ class BotEvents:
         return
 
     async def on_member_join(self, member):
-        channel = member.server.default_channel
-        if member.id is not self.client.id:
-            await self.client.send_message(channel, member.mention + " Welcome to McBig D how can we help you?")
-        return
+        if member.server.id not in self.bot.servers:
+            self.bot.addServer(member.server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
+        settings = self.bot.servers[member.server.id].settings
+        if 'welcomeMessage' in settings:
+            reply = settings['welcomeMessage'][0]
+            channel = member.server.default_channel
+            if member.id is not self.client.user.id:
+                data = AccessData(member, self.client.user)
+                try:
+                    await self.client.send_message(channel, safe_format(reply, data))
+                except AttributeError:
+                    await self.client.send_message(channel, "Something is fishy with this reply: `{}`"
+                        .format(reply))
+                return
+            return
 
         
     async def on_ready(self):

@@ -11,6 +11,9 @@ bot: # All of the settings for the bot itself should go here.
 serverSettings:
   maxTimerSeconds: 10800 # Max time allowed on a timer in seconds. This is 3 hours.
   reactionsEnable: True # Do you want to enable message reactions?
+  welcomeMessage: "{0.author.mention}! What's up homie?" # Welcome message for new users.
+      # The special thing about this is that the member object is passed as 0. You can reference it with 
+      # something like {0.mention} or {0.id} if you wanted. It's pretty dynamic.
   spamFilter: # Spam filter settings
     enable: False # Do you want to enable the filter?
     notifyAdmin: True # Do you want admins to be notified?
