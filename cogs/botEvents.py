@@ -47,10 +47,18 @@ class BotEvents:
     async def on_message_delete(self, msg):
         # If a user sends an echo command then deletes their message,
         # we delete the message that the bot sent (the echo)
-        if msg.id in self.bot.servers[msg.server.id].echoMessages:
+        if (msg.server is not None and 
+                msg.id in self.bot.servers[msg.server.id].echoMessages):
             msgDel = self.bot.servers[msg.server.id].echoMessages[msg.id]
             await self.client.delete_message(msgDel)
         return
+
+    async def on_member_join(self, member):
+        channel = member.server.default_channel
+        if member.id is not self.client.id:
+            await self.client.send_message(channel, member.mention + " Welcome to McBig D how can we help you?")
+        return
+
         
     async def on_ready(self):
         print('Logged in as')
