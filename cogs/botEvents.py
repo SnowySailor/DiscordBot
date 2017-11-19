@@ -60,7 +60,7 @@ class BotEvents:
         if (b_msg.server is not None and
                 b_msg.id in self.bot.servers[a_msg.server.id].echoMessages):
             msgEdit = self.bot.servers[a_msg.server.id].echoMessages[b_msg.id]
-            newReply = re.sub(("^\\"+self.bot.botSettings['prefix']+"echo\s"), "", a_msg.content)
+            newReply = re.sub(("^(\\"+self.bot.botSettings['prefix']+"echo|<@"+self.client.user.id+">\secho)\s"), "", a_msg.content)
             newMsg = await self.client.edit_message(msgEdit, newReply)
             self.bot.servers[a_msg.server.id].echoMessages[a_msg.id] = newMsg
             return
