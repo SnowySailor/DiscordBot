@@ -1,6 +1,7 @@
 import redis
 import os
 import yaml
+import copy
 from enum import Enum
 from markovgen import Markov
 from string import Formatter
@@ -27,9 +28,9 @@ class DiscordBot:
         if server.id in self.servers:
             return
         if not settings:
-            settings = self.defaultServerSettings
+            settings = copy.deepcopy(self.defaultServerSettings)
         if not reactions:
-            reactions = self.defaultServerReactions
+            reactions = copy.deepcopy(self.defaultServerReactions)
         self.servers[server.id] = DiscordServer(server, settings, reactions, messages)
 
 
