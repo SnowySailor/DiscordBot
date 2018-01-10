@@ -1,6 +1,7 @@
 import re
 import random
 import os
+import subprocess
 from classes import AccessData
 from utilities.utilities import safe_format
 
@@ -48,6 +49,15 @@ async def reactToMessage(msg, bot, client):
             await client.send_message(msg.channel, "_{} pats you on the head_".format(client.user.name))
         return
 
+
+    if re.match(".*(computer|internet|server) ?.*(down|slow|broken|broke|sucks|dead)", msg.content, re.IGNORECASE):
+        s = random.randint(0, 1)
+        if(s == 1):
+            # Must have the bofh-excuses installed. For Ubuntu: sudo apt-get install fortune-bofh-excuses
+            output = subprocess.Popen("/usr/games/fortune bofh-excuses | sed -n 3p", stdin=subprocess.PIPE, shell=True, stdout=subprocess.PIPE)
+            await client.send_message(msg.channel, output.communicate()[0].decode("utf-8").strip())
+        return
+
     if ('enable' in bot.servers[msg.server.id].settings['markov'] 
             and bot.servers[msg.server.id].settings['markov']['enable'][0] 
             and re.match("^bot be random", msg.content, re.IGNORECASE)):
@@ -58,15 +68,5 @@ async def reactToMessage(msg, bot, client):
         if bot.servers[msg.server.id].markov is not None:
             text = bot.servers[msg.server.id].markov.generate_markov_text(random.randint(15, 40))
         await client.send_message(msg.channel, text)
-        return
-
-    if re.match(".*(computer|internet|server) ?.*(down|slow|broken|broke|sucks|dead)", msg.content, re.IGNORECASE):
-        s = random.randint(0, 1)
-        if(s == 1):
-            # Must have the bofh-excuses installed. For Ubuntu: sudo apt-get install fortune-bofh-excuses
-            command = "fortune bofh-excuses | sed -n 3p"
-            output = os.popen(command).read()
-            output.strip()
-            await client.send_message(msg.channel, output)
         return
     return

@@ -28,7 +28,6 @@ class SettingsCommands:
 
     @commands.group(pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
-    #@requireServer
     async def settings(self, ctx):
         """Allows changing of server settings"""
         if ctx.invoked_subcommand is None:
@@ -161,10 +160,8 @@ class SettingsCommands:
                 .format(self.settingsUsage()))
             return
 
-    # TODO: Write
     @commands.group(pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
-    #@requireServer
     async def reactions(self, ctx):
         if ctx.invoked_subcommand is None:
             await self.client.say("Unrecognized mode.\n{}"
