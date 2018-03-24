@@ -1,7 +1,7 @@
 from discord.ext import commands
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 from classes import AccessData
-from utilities.utilities import safe_format
+from utilities.utilities import safe_format, loadMarkovFromServer
 import re
 
 class BotEvents:
@@ -87,7 +87,7 @@ class BotEvents:
         if server and server.id not in self.bot.servers:
             # Add a new server to the server dict.
             self.bot.addServer(server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
-        success = await loadMarkov(server, self.bot, self.client)
+        success = await loadMarkovFromServer(server, self.bot, self.client)
         await self.client.send_message(server.default_channel, "Hi! I'm WaifuBot. Type `$help` for commands.")
         
     async def on_ready(self):

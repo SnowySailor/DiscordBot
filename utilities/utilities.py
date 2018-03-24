@@ -1,14 +1,15 @@
 import re
+import discord
 from discord.ext import commands
 from classes import MagicFormatMapping, SafeFormatter
-from utilities.utilities import logMessage
 from ast import literal_eval as make_tuple
 
-async def loadMarkov(server, bot, client):
+async def loadMarkovFromServer(server, bot, client):
+    print("We're here")
     # Ensure that the bot has this server created
     if not server.id in bot.servers:
         return -1
-
+    print("We're here")
     channelsToGet = set()
     # Loop over the channels in the server
     for channel in server.channels:
@@ -19,28 +20,36 @@ async def loadMarkov(server, bot, client):
                 channelsToGet.add(channel)
         else:
             # Try to read preexisting markov channels
-            if bot.readFromYamlData('markoved_channels', bot.servers[server.id]):
+            if bot.servers[server.id].readFromYamlData('markoved_channels'):
                 if not (channel.id in bot.servers[server.id].markoved_channels):
                     channelsToGet.add(channel)   
             else:
                 # If we can't load the channels, then create a new file
                 bot.servers[server.id].markoved_channels = set()
                 channelsToGet.add(channel)
-    
+
     count = 0
     for channel in channelsToGet:
         # Indicate that we've read this channel's history
         bot.servers[server.id].markoved_channels.add(channel.id)
-        # Get the past 500 messages for this channel
-        messages = await client.logs_from(channel, 500)
-        for message in messages:
+        
+        # Check the bot's permissions for the channel
+        perms = server.me.permissions_in(channel)
+        if not (perms.read_messages or perms.read_message_history) or channel.type is not discord.ChannelType.text:
+            # We found a channel that we aren't allowed to access
+            continue
+
+        async for message in client.logs_from(channel, 500):
+            if message.author == client.user or message.author.bot:
+                continue
             # Log each message
             logMessage(message, bot)
             count = count+1
     try:
         # Save the markoved channel id's to file
-        bot.dumpToYamlData('markoved_channels', bot)
-    except Exception:
+        bot.servers[server.id].dumpToYamlData('markoved_channels')
+    except Exception as e:
+        print(str(e))
         return -2
 
     return count

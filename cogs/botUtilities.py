@@ -1,5 +1,6 @@
 from classes import TimeDenum
 from discord.ext import commands
+from utilities.utilities import loadMarkovFromServer
 import itertools
 import string
 import random
@@ -11,16 +12,19 @@ class UtilityCommands:
         self.client = client
         self.bot = bot
 
+    #@commands.has_permissions(manage_server=True)
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_permissions(manage_server=True)
     async def loadMarkov(self, ctx):
-        success = await loadMarkov(ctx.server, self.bot, self.client)
-        if success > 0:
-            await self.client.say("Markov messages loaded " + str(success) + " messages.")
-        else if success == 0:
-            await self.client.say("No messages to load.")
-        else:
-            await self.client.say("Error: Markov messages not loaded.")
+        try:
+            success = await loadMarkovFromServer(ctx.message.server, self.bot, self.client)
+            if success > 0:
+                await self.client.say("Markov messages loaded " + str(success) + " messages.")
+            elif success == 0:
+                await self.client.say("No messages to load.")
+            else:
+                await self.client.say("Error: Markov messages not loaded.")
+        except Exception as e:
+            print(str(e))
 
 
     @commands.command(pass_context=True, no_pm=True)
