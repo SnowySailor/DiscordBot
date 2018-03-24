@@ -2,7 +2,6 @@ from discord.ext import commands
 from utilities.utilities import parse, listSettings, setValue, getValue, deleteEntry, verifySetting
 import re
 import copy
-#from utilities.utilities import requireServer
 
 
 class SettingsCommands:

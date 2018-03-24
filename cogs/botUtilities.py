@@ -12,6 +12,18 @@ class UtilityCommands:
         self.bot = bot
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def loadMarkov(self, ctx):
+        success = await loadMarkov(ctx.server, self.bot, self.client)
+        if success > 0:
+            await self.client.say("Markov messages loaded " + str(success) + " messages.")
+        else if success == 0:
+            await self.client.say("No messages to load.")
+        else:
+            await self.client.say("Error: Markov messages not loaded.")
+
+
+    @commands.command(pass_context=True, no_pm=True)
     async def timer(self, ctx, time=None, name=None):
         serverId = ctx.message.server.id
         """Sets a timer. Usage: timer XhYmZs [NAME]"""

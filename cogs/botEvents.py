@@ -82,6 +82,13 @@ class BotEvents:
                 return
             return
 
+    async def on_server_join(self, server):
+        # Check to see if the server is registered in the bot
+        if server and server.id not in self.bot.servers:
+            # Add a new server to the server dict.
+            self.bot.addServer(server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
+        success = await loadMarkov(server, self.bot, self.client)
+        await self.client.send_message(server.default_channel, "Hi! I'm WaifuBot. Type `$help` for commands.")
         
     async def on_ready(self):
         print('Logged in as')

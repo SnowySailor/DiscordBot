@@ -1,7 +1,48 @@
 import re
 from discord.ext import commands
 from classes import MagicFormatMapping, SafeFormatter
+from utilities.utilities import logMessage
 from ast import literal_eval as make_tuple
+
+async def loadMarkov(server, bot, client):
+    # Ensure that the bot has this server created
+    if not server.id in bot.servers:
+        return -1
+
+    channelsToGet = []
+    # Loop over the channels in the server
+    for channel in server.channels:
+        # If the markoved channels are already loaded
+        if hasattr(bot.servers[server.id], 'markoved_channels'):
+            # If the channel wasn't already markoved
+            if not (channel.id in bot.servers[server.id].markoved_channels):
+                channelsToGet.append(channel)
+        else:
+            # Try to read preexisting markov channels
+            if bot.readFromYamlData('markoved_channels', bot.servers[server.id]):
+                if not (channel.id in bot.servers[server.id].markoved_channels):
+                    channelsToGet.append(channel)   
+            else:
+                # If we can't load the channels, then create a new file
+                bot.servers[server.id].markoved_channels = []
+    
+    count = 0
+    for channel in channelsToGet:
+        # Indicate that we've read this channel's history
+        bot.servers[server.id].markoved_channels.append(channel.id)
+        # Get the past 500 messages for this channel
+        messages = await client.logs_from(channel, 500)
+        for message in messages:
+            # Log each message
+            logMessage(message, bot)
+            count = count+1
+    try:
+        # Save the markoved channel id's to file
+        bot.dumpToYamlData('markoved_channels', bot)
+    except Exception:
+        return -2
+
+    return count
 
 def cleanMessage(msg, bot):
     serverId = msg.server.id
@@ -34,8 +75,8 @@ def logMessage(msg, bot):
     serverId = msg.server.id
     line = cleanMessage(msg, bot)
 
-    # If the message is longer than the min sentence length we can process and log it
     lineLen = len(line.split())
+    # If the message is longer than the min sentence length we can process and log it
     if (('sentenceLength' in bot.servers[serverId].settings['markov'] and
             lineLen >= bot.servers[serverId].settings['markov']['sentenceLength'][0]) or
             ('sentenceLength' not in bot.servers[serverId].settings['markov'] and lineLen >= 5)):
@@ -155,6 +196,11 @@ def verifyAdmin(user, admins):
     if user.id in admins:
         return True
     return False
+
+def file_to_lines(filename):
+    with open(filename, 'r') as f:
+        lines = f.read().split('\n')
+    return lines
 
 
 # Use if the command requires the server to be in the DiscordBot
