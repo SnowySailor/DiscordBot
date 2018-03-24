@@ -18,7 +18,7 @@ class UtilityCommands:
         try:
             success = await loadMarkovFromServer(ctx.message.server, self.bot, self.client)
             if success > 0:
-                await self.client.say("Markov messages loaded " + str(success) + " messages.")
+                await self.client.say("Success! Loaded " + str(success) + " messages.")
             elif success == 0:
                 await self.client.say("No messages to load.")
             else:

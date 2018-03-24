@@ -5,11 +5,10 @@ from classes import MagicFormatMapping, SafeFormatter
 from ast import literal_eval as make_tuple
 
 async def loadMarkovFromServer(server, bot, client):
-    print("We're here")
     # Ensure that the bot has this server created
     if not server.id in bot.servers:
         return -1
-    print("We're here")
+    
     channelsToGet = set()
     # Loop over the channels in the server
     for channel in server.channels:
@@ -28,7 +27,6 @@ async def loadMarkovFromServer(server, bot, client):
                 bot.servers[server.id].markoved_channels = set()
                 channelsToGet.add(channel)
 
-    count = 0
     for channel in channelsToGet:
         # Indicate that we've read this channel's history
         bot.servers[server.id].markoved_channels.add(channel.id)
@@ -44,7 +42,7 @@ async def loadMarkovFromServer(server, bot, client):
                 continue
             # Log each message
             logMessage(message, bot)
-            count = count+1
+
     try:
         # Save the markoved channel id's to file
         bot.servers[server.id].dumpToYamlData('markoved_channels')
@@ -52,7 +50,7 @@ async def loadMarkovFromServer(server, bot, client):
         print(str(e))
         return -2
 
-    return count
+    return bot.servers[server.id].markov.line_size
 
 def cleanMessage(msg, bot):
     serverId = msg.server.id
