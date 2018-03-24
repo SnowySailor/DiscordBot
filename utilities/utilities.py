@@ -9,27 +9,28 @@ async def loadMarkov(server, bot, client):
     if not server.id in bot.servers:
         return -1
 
-    channelsToGet = []
+    channelsToGet = set()
     # Loop over the channels in the server
     for channel in server.channels:
         # If the markoved channels are already loaded
         if hasattr(bot.servers[server.id], 'markoved_channels'):
             # If the channel wasn't already markoved
             if not (channel.id in bot.servers[server.id].markoved_channels):
-                channelsToGet.append(channel)
+                channelsToGet.add(channel)
         else:
             # Try to read preexisting markov channels
             if bot.readFromYamlData('markoved_channels', bot.servers[server.id]):
                 if not (channel.id in bot.servers[server.id].markoved_channels):
-                    channelsToGet.append(channel)   
+                    channelsToGet.add(channel)   
             else:
                 # If we can't load the channels, then create a new file
-                bot.servers[server.id].markoved_channels = []
+                bot.servers[server.id].markoved_channels = set()
+                channelsToGet.add(channel)
     
     count = 0
     for channel in channelsToGet:
         # Indicate that we've read this channel's history
-        bot.servers[server.id].markoved_channels.append(channel.id)
+        bot.servers[server.id].markoved_channels.add(channel.id)
         # Get the past 500 messages for this channel
         messages = await client.logs_from(channel, 500)
         for message in messages:
