@@ -12,7 +12,7 @@ class UtilityCommands:
         self.client = client
         self.bot = bot
 
-    #@commands.has_permissions(manage_server=True)
+    @commands.has_permissions(manage_server=True)
     @commands.command(pass_context=True, no_pm=True)
     async def loadMarkov(self, ctx):
         try:
