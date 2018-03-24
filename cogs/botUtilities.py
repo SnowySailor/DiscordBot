@@ -98,3 +98,11 @@ class UtilityCommands:
         await asyncio.sleep(timeNum)
         await self.client.say("<@{}> Timer `{}` expired.".format(callingUser, name))
         return
+
+
+    @loadMarkov.error
+    async def loadMarkovError(self, error, ctx):
+        if isinstance(error, commands.CheckFailure):
+            await self.client.say("Sorry, you don't have the Manage Server "\
+                "permission.")
+            return
