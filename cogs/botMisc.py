@@ -33,7 +33,7 @@ class MiscCommands:
         for s in val:
             current = s.lower().strip()
             if current in allowedCookies:
-                toPass.add(current)
+                toPass.append(current)
         if len(toPass) > 0:
             args = ' '.join(toPass)
         else:
