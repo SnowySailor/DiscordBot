@@ -38,7 +38,7 @@ class MiscCommands:
             args = ' '.join(toPass)
         else:
             args = "fortunes riddles literature chucknorris pony"
-        command = "fortune -e " + args
+        command = "/usr/games/fortune -e " + args
         output = os.popen(command).read()
         output.strip()
         toSend = output
