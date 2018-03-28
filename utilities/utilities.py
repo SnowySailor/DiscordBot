@@ -210,6 +210,12 @@ def file_to_lines(filename):
         lines = f.read().split('\n')
     return lines
 
+def getChannelById(client, channelId):
+    return client.get_channel(channelId)
+
+async def sendMessage(client, channel, msg):
+    return await client.send_message(channel, msg)
+
 
 # Use if the command requires the server to be in the DiscordBot
 # def requireServer():

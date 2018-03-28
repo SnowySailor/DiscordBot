@@ -22,13 +22,6 @@ serverSettings:
   markov: # All of the markov settings should be stored here
     enable: True # Do you want to have markov enabled?
     min: 1000 # Minimum messages for markov to run. The less you have, the poorer the results will be at the start.
-    maxBytes: 5000000 # Maximum number of bytes to read into memory for each server's message log.
-                            # to put this into reference, the average word length is 5 characters. Most words
-                            # written will just be aschii characters which utf-8 sees as 1 byte.
-                            # If you know how many words you want to have stored, multiply that number by
-                            # 5 (characters in each word) and you should get a number of bytes to use.
-                            # Something else to consider is the fact that Python memory usage isn't perfect
-                            # so the actual memory usage will probably be a fair amount more than the number here
     sentenceLength: 5 # Number of words a message must be in order to be considered good data
     digestLength: 15 # Only add messages longer than this length to the current markov object
     removeNonAlphanumWords: True # Do you want to treat single-character words like # or % as real words?

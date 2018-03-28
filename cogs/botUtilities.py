@@ -1,6 +1,6 @@
 from classes import TimeDenum
 from discord.ext import commands
-from utilities.utilities import loadMarkovFromServer
+from utilities.utilities import loadMarkovFromServer, getChannelById
 import itertools
 import string
 import random
@@ -15,20 +15,32 @@ class UtilityCommands:
     @commands.has_permissions(manage_server=True)
     @commands.command(pass_context=True, no_pm=True)
     async def loadMarkov(self, ctx):
+        botChan = ctx.message.channel
+        prepend = ""
+        if 'botChannel' in self.bot.servers[ctx.message.server.id].settings:
+            botChan = getChannelById(self.client, self.bot.servers[ctx.message.server.id].settings['botChannel'][0])
+            if botChan.id != ctx.message.channel.id:
+                prepend = ctx.message.author.mention + "\n"
         try:
             success = await loadMarkovFromServer(ctx.message.server, self.bot, self.client)
             if success > 0:
-                await self.client.say("Success! Loaded " + str(success) + " messages.")
+                await self.client.send_message(botChan, prepend + "Success! Loaded " + str(success) + " messages.")
             elif success == 0:
-                await self.client.say("No messages to load.")
+                await self.client.send_message(botChan, prepend + "No messages to load.")
             else:
-                await self.client.say("Error: Markov messages not loaded.")
+                await self.client.send_message(botChan, prepend + "Error: Markov messages not loaded.")
         except Exception as e:
             print(str(e))
 
 
     @commands.command(pass_context=True, no_pm=True)
     async def timer(self, ctx, time=None, name=None):
+        botChan = ctx.message.channel
+        prepend = ""
+        if 'botChannel' in self.bot.servers[ctx.message.server.id].settings:
+            botChan = getChannelById(self.client, self.bot.servers[ctx.message.server.id].settings['botChannel'][0])
+            if botChan.id != ctx.message.channel.id:
+                prepend = ctx.message.author.mention + "\n"
         serverId = ctx.message.server.id
         """Sets a timer. Usage: timer XhYmZs [NAME]"""
         def timerUsage():
@@ -44,7 +56,7 @@ class UtilityCommands:
                 return value*3600
 
         if not time:
-            await self.client.say("Not enough arguments.\n{}".format(timerUsage()))
+            await self.client.send_message(botChan, prepend + "Not enough arguments.\n{}".format(timerUsage()))
             return
 
         validTimes = {'seconds': TimeDenum.S, 'second': TimeDenum.S, 
@@ -57,7 +69,7 @@ class UtilityCommands:
         try:
             timeNum = int(timeSplit[0])
         except ValueError:
-            await self.client.say("Unrecognized time: {}\n{}".format(
+            await self.client.send_message(botChan, prepend + "Unrecognized time: {}\n{}".format(
                              time, timerUsage()))
             return
         if len(timeSplit) > 1:
@@ -69,7 +81,7 @@ class UtilityCommands:
                 try:
                     add = int(timeSplit[count])
                 except ValueError:
-                    await self.client.say("Unrecognized time: {}\n{}".format(
+                    await self.client.send_message(botChan, prepend + "Unrecognized time: {}\n{}".format(
                                      time, timerUsage()))
                     return
                 if count+1 < len(timeSplit):
@@ -77,11 +89,11 @@ class UtilityCommands:
                     if desc.lower() in validTimes:
                         timeNum += convertToSeconds(add, validTimes[desc.lower()])
                     else:
-                        await self.client.say("Unrecognized time multiplier: {}\n{}"
+                        await self.client.send_message(botChan, prepend + "Unrecognized time multiplier: {}\n{}"
                                          .format(desc, timerUsage()))
                         return
                 else:
-                    await self.client.say("Unexpected time termination: {}\n{}"
+                    await self.client.send_message(botChan, prepend + "Unexpected time termination: {}\n{}"
                                      .format(time, timerUsage()))
                     return
                 count += 2
@@ -92,17 +104,23 @@ class UtilityCommands:
             name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         if ('maxTimerSeconds' in self.bot.servers[serverId].settings and
                 timeNum > self.bot.servers[serverId].settings['maxTimerSeconds'][0]):
-            await self.client.say("The time requested is too much. Please use a smaller number.")
+            await self.client.send_message(botChan, prepend + "The time requested is too much. Please use a smaller number.")
             return
-        await self.client.say("Timer called `{}` started. It will expire in {}.".format(name, expireTime))
+        await self.client.send_message(botChan, prepend + "Timer called `{}` started. It will expire in {}.".format(name, expireTime))
         await asyncio.sleep(timeNum)
-        await self.client.say("<@{}> Timer `{}` expired.".format(callingUser, name))
+        await self.client.send_message(botChan, "<@{}> Timer `{}` expired.".format(callingUser, name))
         return
 
 
     @loadMarkov.error
     async def loadMarkovError(self, error, ctx):
+        botChan = ctx.message.channel
+        prepend = ""
+        if 'botChannel' in self.bot.servers[ctx.message.server.id].settings:
+            botChan = getChannelById(self.client, self.bot.servers[ctx.message.server.id].settings['botChannel'][0])
+            if botChan.id != ctx.message.channel.id:
+                prepend = ctx.message.author.mention + "\n"
         if isinstance(error, commands.CheckFailure):
-            await self.client.say("Sorry, you don't have the Manage Server "\
+            await self.client.send_message(botChan, prepend + "Sorry, you don't have the Manage Server "\
                 "permission.")
             return

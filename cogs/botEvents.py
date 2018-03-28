@@ -1,7 +1,7 @@
 from discord.ext import commands
 from modules.messageHandler import handle, handlePersonalMessage, handleBotMention
 from classes import AccessData
-from utilities.utilities import safe_format, loadMarkovFromServer
+from utilities.utilities import safe_format, loadMarkovFromServer, getChannelById
 import re
 
 class BotEvents:
@@ -19,6 +19,9 @@ class BotEvents:
         if msg.server and msg.server.id not in self.bot.servers:
             # Add a new server to the server dict.
             self.bot.addServer(msg.server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
+            if 'botChannel' in self.bot.servers[msg.server.id].settings:
+                self.bot.servers[msg.server.id].botChannel = getChannelById(self.client,
+                    self.bot.servers[msg.server.id].settings["botChannel"][0])
 
         await self.client.process_commands(msg)
 
@@ -68,6 +71,11 @@ class BotEvents:
     async def on_member_join(self, member):
         if member.server.id not in self.bot.servers:
             self.bot.addServer(member.server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
+
+        botChan = member.server.default_channel
+        if 'botChannel' in self.bot.servers[ctx.message.server.id].settings:
+            botChan = getChannelById(self.client, self.bot.servers[member.server.id].settings['botChannel'][0])
+
         settings = self.bot.servers[member.server.id].settings
         if 'welcomeMessage' in settings:
             reply = settings['welcomeMessage'][0]
@@ -77,7 +85,7 @@ class BotEvents:
                 try:
                     await self.client.send_message(channel, safe_format(reply, data))
                 except AttributeError:
-                    await self.client.send_message(channel, "Something is fishy with this reply: `{}`"
+                    await self.client.send_message(botChan, "Something is fishy with this reply: `{}`"
                         .format(reply))
                 return
             return
@@ -88,7 +96,7 @@ class BotEvents:
             # Add a new server to the server dict.
             self.bot.addServer(server, self.bot.defaultServerSettings, self.bot.defaultServerReactions)
         success = await loadMarkovFromServer(server, self.bot, self.client)
-        await self.client.send_message(server.default_channel, "Hi! I'm WaifuBot. Type `$help` for commands.")
+        #await self.client.send_message(server.default_channel, "Hi! I'm WaifuBot. Type `$help` for commands.")
         
     async def on_ready(self):
         print('Logged in as')
