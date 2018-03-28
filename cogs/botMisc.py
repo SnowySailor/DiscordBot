@@ -31,10 +31,10 @@ class MiscCommands:
         allowedCookies = ["fortunes", "riddles", "literature", "chucknorris", "pony"]
         toPass = []
         for s in val:
-            current = lower(val).strip()
+            current = s.lower().strip()
             if current in allowedCookies:
                 toPass.add(current)
-        if len(toPass) == 0:
+        if len(toPass) > 0:
             args = ' '.join(toPass)
         else:
             args = "fortunes riddles literature chucknorris pony"
