@@ -27,6 +27,42 @@ class SettingsCommands:
 
     @commands.group(pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
+    async def setBotChannel(self, ctx, chan):
+
+        search = re.search('<#(.*)>', chan)
+        if search is None:
+            await self.client.say("Invalid channel. Reference it like: " + ctx.message.server.default_channel.mention)
+            return
+
+        chan = self.client.get_channel(search.group(1))
+
+        if chan is None:
+            await self.client.say("Could not find that channel.")
+            return
+
+        if chan.server.id != ctx.message.server.id:
+            await self.client.say("Nice try. That channel isn't in this server.")
+            return
+
+        self.bot.servers[ctx.message.server.id].settings['botChannel'] = (chan.id, type(chan.id))
+        await self.client.send_message(chan, ctx.message.author.mention + " This is my home now.")
+        self.bot.servers[ctx.message.server.id].dumpToYamlData("settings")
+
+    @commands.group(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def clearBotChannel(self, ctx):
+        try:
+            if 'botChannel' in self.bot.servers[ctx.message.server.id].settings:
+                del self.bot.servers[ctx.message.server.id].settings['botChannel']
+                self.bot.servers[ctx.message.server.id].dumpToYamlData("settings")
+                await self.client.say("Now I have no home...")
+            else:
+                await self.client.say("My channel was never set.")
+        except Exception as e:
+            print(str(e))
+
+    @commands.group(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def settings(self, ctx):
         """Allows changing of server settings"""
         if ctx.invoked_subcommand is None:

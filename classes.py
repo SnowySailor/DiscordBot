@@ -19,9 +19,6 @@ class DiscordBot:
         self.defaultServerReactions = reactions
         self.botSettings = botSettings
         self.servers = dict()
-        # # Only create a redis instance if we need it
-        # if ('redisLimit' in self.botSettings and 
-        #         self.botSettings['redisLimit']):
         self.redis = redis.StrictRedis(decode_responses=True)
 
     def addServer(self, server, settings=None, reactions=None, messages=0):
@@ -73,7 +70,7 @@ class DiscordServer:
                         lengthRestriction = self.settings['markov']['digestLength'][0]
                     elif 'sentenceLength' in settings['markov']:
                         lengthRestriction = self.settings['markov']['sentenceLength'][0]
-                    self.markov = Markov(f, self.settings['markov']['maxBytes'][0], False, lengthRestriction)
+                    self.markov = Markov(f, 100000000, False, lengthRestriction)
                     print("Loaded {} messages from file.".format(self.markov.line_size))
 
     def dumpToYamlData(self, thing):
